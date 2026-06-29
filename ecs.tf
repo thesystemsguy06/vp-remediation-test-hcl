@@ -7,4 +7,9 @@ resource "aws_ecs_cluster" "vp_test" {
   tags = merge(local.common_tags, {
     Name = "vp-test-cluster"
   })
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
