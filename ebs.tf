@@ -1,5 +1,5 @@
 # Unencrypted EBS volumes — triggers EC2.3
-resource "aws_ebs_volume" "vp_test_data_vol" {
+resource "aws_ebs_volume" "vp_test_data" {
   availability_zone = "us-east-1a"
   size              = 20
   encrypted         = false

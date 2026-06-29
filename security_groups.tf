@@ -1,8 +1,8 @@
 # Web SG allowing SSH from anywhere — triggers EC2.2, EC2.13
-resource "aws_security_group" "vp_test_web_sg" {
+resource "aws_security_group" "vp_test_web" {
   name        = "vp-test-web-sg"
   description = "Web server security group — intentionally insecure"
-  vpc_id      = aws_vpc.vp_test_vpc.id
+  vpc_id      = aws_vpc.vp_test.id
 
   ingress {
     description = "SSH from anywhere (insecure)"
@@ -34,10 +34,10 @@ resource "aws_security_group" "vp_test_web_sg" {
 }
 
 # DB SG allowing RDP from anywhere and all traffic — triggers EC2.18, EC2.19
-resource "aws_security_group" "vp_test_db_sg" {
+resource "aws_security_group" "vp_test_db" {
   name        = "vp-test-db-sg"
   description = "Database security group — intentionally insecure"
-  vpc_id      = aws_vpc.vp_test_vpc.id
+  vpc_id      = aws_vpc.vp_test.id
 
   ingress {
     description = "RDP from anywhere (insecure)"
@@ -72,7 +72,7 @@ resource "aws_security_group" "vp_test_db_sg" {
 resource "aws_security_group" "vp_test_default_sg" {
   name        = "vp-test-default-sg"
   description = "Default-like security group with unrestricted access"
-  vpc_id      = aws_vpc.vp_test_vpc.id
+  vpc_id      = aws_vpc.vp_test.id
 
   ingress {
     description = "All inbound (insecure)"

@@ -1,6 +1,6 @@
 # S3 bucket with NO versioning, NO encryption, NO public access block,
 # NO server access logging, NO SSL enforcement — triggers S3.1, S3.5, S3.8, S3.9
-resource "aws_s3_bucket" "vp_test_data_bucket" {
+resource "aws_s3_bucket" "vp_test_data" {
   bucket = "vp-test-data-bucket-e2e-insecure"
 
   tags = merge(local.common_tags, {
@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "vp_test_data_bucket" {
 }
 
 # Log bucket with NO versioning, NO lifecycle policy
-resource "aws_s3_bucket" "vp_test_logs_bucket" {
+resource "aws_s3_bucket" "vp_test_logs" {
   bucket = "vp-test-logs-bucket-e2e-insecure"
 
   tags = merge(local.common_tags, {

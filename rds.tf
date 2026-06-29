@@ -1,7 +1,7 @@
 # RDS subnet group for test instances
 resource "aws_db_subnet_group" "vp_test_db_subnet_group" {
   name       = "vp-test-db-subnet-group"
-  subnet_ids = [aws_subnet.vp_test_private_subnet.id, aws_subnet.vp_test_public_subnet.id]
+  subnet_ids = [aws_subnet.vp_test_private_subnet.id, aws_subnet.vp_test_public.id]
 
   tags = merge(local.common_tags, {
     Name = "vp-test-db-subnet-group"
@@ -22,7 +22,7 @@ resource "aws_db_instance" "vp_test_payments_db" {
   password = "insecure_password_123!"
 
   db_subnet_group_name   = aws_db_subnet_group.vp_test_db_subnet_group.name
-  vpc_security_group_ids = [aws_security_group.vp_test_db_sg.id]
+  vpc_security_group_ids = [aws_security_group.vp_test_db.id]
 
   publicly_accessible     = true
   storage_encrypted       = false
@@ -53,7 +53,7 @@ resource "aws_db_instance" "vp_test_analytics_db" {
   password = "insecure_password_456!"
 
   db_subnet_group_name   = aws_db_subnet_group.vp_test_db_subnet_group.name
-  vpc_security_group_ids = [aws_security_group.vp_test_db_sg.id]
+  vpc_security_group_ids = [aws_security_group.vp_test_db.id]
 
   storage_encrypted          = false
   backup_retention_period    = 0

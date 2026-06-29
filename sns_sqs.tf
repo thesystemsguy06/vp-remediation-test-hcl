@@ -10,7 +10,7 @@ resource "aws_sns_topic" "vp_test_notifications" {
 }
 
 # SQS queue with no encryption and no DLQ — triggers SQS.1
-resource "aws_sqs_queue" "vp_test_work_queue" {
+resource "aws_sqs_queue" "vp_test_work" {
   name = "vp-test-work-queue"
 
   # No kms_master_key_id — unencrypted

@@ -3,8 +3,8 @@
 resource "aws_instance" "vp_test_web_server" {
   ami                         = "ami-0c02fb55956c7d316"
   instance_type               = "t3.micro"
-  subnet_id                   = aws_subnet.vp_test_public_subnet.id
-  vpc_security_group_ids      = [aws_security_group.vp_test_web_sg.id]
+  subnet_id                   = aws_subnet.vp_test_public.id
+  vpc_security_group_ids      = [aws_security_group.vp_test_web.id]
   associate_public_ip_address = true
 
   metadata_options {
@@ -23,8 +23,8 @@ resource "aws_instance" "vp_test_web_server" {
 resource "aws_instance" "vp_test_bastion" {
   ami                         = "ami-0c02fb55956c7d316"
   instance_type               = "t3.micro"
-  subnet_id                   = aws_subnet.vp_test_public_subnet.id
-  vpc_security_group_ids      = [aws_security_group.vp_test_web_sg.id]
+  subnet_id                   = aws_subnet.vp_test_public.id
+  vpc_security_group_ids      = [aws_security_group.vp_test_web.id]
   associate_public_ip_address = true
 
   monitoring = false
