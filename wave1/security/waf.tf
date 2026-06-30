@@ -1,0 +1,121 @@
+# WAF resources with intentionally non-compliant configurations
+# Wave 1 — Free tier, no VPC dependencies
+#
+# Triggered controls:
+#   WAF.1  — Classic Global web ACL logging should be enabled
+#   WAF.2  — Regional rule should have at least one condition
+#   WAF.3  — Regional rule group should have at least one rule
+#   WAF.4  — Classic Regional web ACL should have at least one rule
+#   WAF.6  — Classic Global rule should have at least one condition
+#   WAF.7  — Classic Global rule group should have at least one rule
+#   WAF.8  — Classic Global web ACL should have at least one rule
+#   WAF.10 — WAFv2 web ACL should have at least one rule or rule group
+#   WAF.11 — WAF web ACL logging should be enabled
+#   WAF.12 — WAF rules should have CloudWatch metrics enabled
+
+variable "common_tags_security" {
+  default = {
+    ManagedBy = "vectorplane-e2e-test"
+    Wave      = "1"
+  }
+}
+
+# --- WAFv2 (modern) ---
+
+# WAFv2 web ACL — no rules, no logging — triggers WAF.10, WAF.11, WAF.12
+resource "aws_wafv2_web_acl" "vp_test" {
+  name  = "vp-test-insecure-wafv2"
+  scope = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = false
+    metric_name                = "vp-test-wafv2"
+    sampled_requests_enabled   = false
+  }
+
+  # No rules — triggers WAF.10
+  # No logging — triggers WAF.11
+  # cloudwatch_metrics_enabled = false — triggers WAF.12
+
+  tags = var.common_tags_security
+}
+
+# WAFv2 rule group — empty
+resource "aws_wafv2_rule_group" "vp_test" {
+  name     = "vp-test-empty-rule-group"
+  scope    = "REGIONAL"
+  capacity = 10
+
+  visibility_config {
+    cloudwatch_metrics_enabled = false
+    metric_name                = "vp-test-rule-group"
+    sampled_requests_enabled   = false
+  }
+
+  tags = var.common_tags_security
+}
+
+# --- WAF Classic Global ---
+
+# Classic Global web ACL — no rules — triggers WAF.1, WAF.8
+resource "aws_waf_web_acl" "vp_test" {
+  name        = "vp-test-classic-global-acl"
+  metric_name = "vpTestClassicGlobalAcl"
+
+  default_action {
+    type = "ALLOW"
+  }
+
+  # No rules — triggers WAF.8
+  # No logging — triggers WAF.1
+}
+
+# Classic Global rule — no predicates — triggers WAF.6
+resource "aws_waf_rule" "vp_test" {
+  name        = "vp-test-classic-global-rule"
+  metric_name = "vpTestClassicGlobalRule"
+
+  # No predicates — triggers WAF.6
+}
+
+# Classic Global rule group — empty — triggers WAF.7
+resource "aws_waf_rule_group" "vp_test" {
+  name        = "vp-test-classic-global-rg"
+  metric_name = "vpTestClassicGlobalRg"
+
+  # No activated_rule — triggers WAF.7
+}
+
+# --- WAF Classic Regional ---
+
+# Classic Regional web ACL — no rules — triggers WAF.4
+resource "aws_wafregional_web_acl" "vp_test" {
+  name        = "vp-test-classic-regional-acl"
+  metric_name = "vpTestClassicRegionalAcl"
+
+  default_action {
+    type = "ALLOW"
+  }
+
+  # No rules — triggers WAF.4
+}
+
+# Classic Regional rule — no predicates — triggers WAF.2
+resource "aws_wafregional_rule" "vp_test" {
+  name        = "vp-test-classic-regional-rule"
+  metric_name = "vpTestClassicRegionalRule"
+
+  # No predicates — triggers WAF.2
+}
+
+# Classic Regional rule group — empty — triggers WAF.3
+resource "aws_wafregional_rule_group" "vp_test" {
+  name        = "vp-test-classic-regional-rg"
+  metric_name = "vpTestClassicRegionalRg"
+
+  # No activated_rule — triggers WAF.3
+}
