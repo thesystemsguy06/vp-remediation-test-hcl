@@ -60,62 +60,8 @@ resource "aws_wafv2_rule_group" "vp_test" {
 }
 
 # --- WAF Classic Global ---
-
-# Classic Global web ACL — no rules — triggers WAF.1, WAF.8
-resource "aws_waf_web_acl" "vp_test" {
-  name        = "vp-test-classic-global-acl"
-  metric_name = "vpTestClassicGlobalAcl"
-
-  default_action {
-    type = "ALLOW"
-  }
-
-  # No rules — triggers WAF.8
-  # No logging — triggers WAF.1
-}
-
-# Classic Global rule — no predicates — triggers WAF.6
-resource "aws_waf_rule" "vp_test" {
-  name        = "vp-test-classic-global-rule"
-  metric_name = "vpTestClassicGlobalRule"
-
-  # No predicates — triggers WAF.6
-}
-
-# Classic Global rule group — empty — triggers WAF.7
-resource "aws_waf_rule_group" "vp_test" {
-  name        = "vp-test-classic-global-rg"
-  metric_name = "vpTestClassicGlobalRg"
-
-  # No activated_rule — triggers WAF.7
-}
+# DISABLED: AWS deprecated WAF Classic v1 resource creation after May 2025.
+# WAF Classic controls (WAF.1-8) cannot be tested via new resource creation.
 
 # --- WAF Classic Regional ---
-
-# Classic Regional web ACL — no rules — triggers WAF.4
-resource "aws_wafregional_web_acl" "vp_test" {
-  name        = "vp-test-classic-regional-acl"
-  metric_name = "vpTestClassicRegionalAcl"
-
-  default_action {
-    type = "ALLOW"
-  }
-
-  # No rules — triggers WAF.4
-}
-
-# Classic Regional rule — no predicates — triggers WAF.2
-resource "aws_wafregional_rule" "vp_test" {
-  name        = "vp-test-classic-regional-rule"
-  metric_name = "vpTestClassicRegionalRule"
-
-  # No predicates — triggers WAF.2
-}
-
-# Classic Regional rule group — empty — triggers WAF.3
-resource "aws_wafregional_rule_group" "vp_test" {
-  name        = "vp-test-classic-regional-rg"
-  metric_name = "vpTestClassicRegionalRg"
-
-  # No activated_rule — triggers WAF.3
-}
+# DISABLED: Same deprecation applies to regional WAF Classic resources.

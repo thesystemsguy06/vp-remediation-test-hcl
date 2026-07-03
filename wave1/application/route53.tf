@@ -7,7 +7,7 @@
 
 # Public hosted zone — no query logging — triggers Route53.2
 resource "aws_route53_zone" "vp_test" {
-  name = "vp-test-e2e.example.com"
+  name = "vp-test-e2e.vectorplane.dev"
 
   # No aws_route53_query_log — triggers Route53.2
 
