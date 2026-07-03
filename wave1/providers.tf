@@ -12,12 +12,12 @@ terraform {
     }
   }
 
-  # Backend configuration — uncomment and configure for remote state
-  # backend "s3" {
-  #   bucket = "vp-e2e-test-tfstate"
-  #   key    = "wave1/terraform.tfstate"
-  #   region = "us-east-1"
-  # }
+  backend "s3" {
+    bucket  = "vp-test-data-746210888062"
+    key     = "wave1/terraform.tfstate"
+    region  = "us-east-1"
+    profile = "vp-target-user"
+  }
 }
 
 provider "aws" {
