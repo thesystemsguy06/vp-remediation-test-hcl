@@ -37,10 +37,6 @@ resource "aws_dynamodb_table" "vp_test" {
     ManagedBy = "vectorplane-e2e-test"
     Wave      = "1"
   }
-
-  point_in_time_recovery {
-    enabled = true
-  }
 }
 
 # DAX IAM role (needed for DAX cluster)
