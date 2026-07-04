@@ -24,8 +24,9 @@ variable "common_tags_storage" {
 
 # Primary test bucket
 resource "aws_s3_bucket" "vp_test_data" {
-  bucket = "vp-e2e-test-data-${random_id.suffix.hex}"
-  tags   = var.common_tags_storage
+  block_public_acls = true
+  bucket            = "vp-e2e-test-data-${random_id.suffix.hex}"
+  tags              = var.common_tags_storage
 }
 
 resource "random_id" "suffix" {
