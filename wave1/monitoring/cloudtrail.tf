@@ -17,6 +17,15 @@ resource "aws_s3_bucket" "vp_test_cloudtrail" {
   force_destroy = true
 
   tags = var.common_tags_monitoring
+
+  lifecycle_rule {
+    enabled = true
+    id      = "cleanup"
+    expiration {
+      days = 90
+
+    }
+  }
 }
 
 resource "random_id" "ct_suffix" {
