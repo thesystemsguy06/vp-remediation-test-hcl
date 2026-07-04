@@ -44,6 +44,26 @@ resource "aws_wafv2_web_acl" "vp_test" {
   tags = var.common_tags_security
 }
 
+# IP set for blocking known malicious IPs
+resource "aws_wafv2_ip_set" "vp_test_blocked_ips" {
+  name               = "vp_test-blocked-ips"
+  description        = "IP set for blocking known malicious IP addresses"
+  scope              = "REGIONAL"
+  ip_address_version = "IPV4"
+
+  addresses = [
+    "10.0.0.0/8",
+    "192.168.0.0/16"
+  ]
+
+  tags = {
+    Name       = "vp_test-blocked-ips"
+    Purpose    = "WAF IP blocking"
+    Compliance = "SecurityHub-WAF.10"
+  }
+}
+
+
 # WAFv2 rule group — empty
 resource "aws_wafv2_rule_group" "vp_test" {
   name     = "vp-test-empty-rule-group"
