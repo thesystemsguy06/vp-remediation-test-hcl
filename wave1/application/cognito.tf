@@ -15,7 +15,7 @@ resource "aws_cognito_user_pool" "vp_test" {
     require_uppercase = false
   }
 
-  mfa_configuration = "OFF"
+  mfa_configuration = ON
 
   # No user_pool_add_ons with advanced_security_mode — triggers Cognito.1
 
