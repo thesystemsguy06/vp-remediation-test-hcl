@@ -8,7 +8,7 @@
 
 resource "aws_appsync_graphql_api" "vp_test" {
   name                = "vp-test-insecure-api"
-  authentication_type = "API_KEY"
+  authentication_type = AWS_IAM
 
   schema = <<-SCHEMA
     type Query {
