@@ -8,7 +8,7 @@
 
 resource "aws_ecr_repository" "vp_test" {
   name                 = "vp-test-insecure-repo"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   # No image_scanning_configuration — triggers ECR.1
   # MUTABLE tags — triggers ECR.2
