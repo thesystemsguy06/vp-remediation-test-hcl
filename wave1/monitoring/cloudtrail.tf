@@ -28,6 +28,14 @@ resource "aws_s3_bucket" "vp_test_cloudtrail" {
   }
 }
 
+resource "aws_s3_bucket_logging" "vp_test_cloudtrail_logging" {
+  bucket = aws_s3_bucket.vp_test_cloudtrail.id
+
+  target_bucket = aws_s3_bucket.vp_test_cloudtrail.id
+  target_prefix = "access-logs/"
+}
+
+
 resource "random_id" "ct_suffix" {
   byte_length = 4
 }
