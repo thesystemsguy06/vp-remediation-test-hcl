@@ -32,7 +32,7 @@ resource "aws_cognito_user_pool" "vp_test" {
 
 resource "aws_cognito_identity_pool" "vp_test" {
   identity_pool_name               = "vp_test_insecure_identity"
-  allow_unauthenticated_identities = true
+  allow_unauthenticated_identities = false
 
   tags = {
     ManagedBy = "vectorplane-e2e-test"
