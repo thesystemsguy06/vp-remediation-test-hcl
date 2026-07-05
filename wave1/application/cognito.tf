@@ -23,6 +23,10 @@ resource "aws_cognito_user_pool" "vp_test" {
     ManagedBy = "vectorplane-e2e-test"
     Wave      = "1"
   }
+
+  user_pool_add_ons {
+    advanced_security_mode = "ENFORCED"
+  }
 }
 
 resource "aws_cognito_identity_pool" "vp_test" {
