@@ -34,6 +34,30 @@ resource "aws_cloudwatch_event_bus" "vp_test" {
   tags = var.common_tags_monitoring
 }
 
+data "aws_caller_identity" "current" {}
+
+resource "aws_cloudwatch_event_bus_policy" "vp_test_policy" {
+  event_bus_name = aws_cloudwatch_event_bus.vp_test.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowAccountAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action = [
+          "events:PutEvents"
+        ]
+        Resource = aws_cloudwatch_event_bus.vp_test.arn
+      }
+    ]
+  })
+}
+
+
 # Note: aws_cloudwatch_metric_alarm and aws_cloudwatch_log_metric_filter are
 # BUNDLE resources — VP remediation CREATES them as new resources.
 # Their absence IS the non-compliant state for CloudWatch.1, 3-16.
