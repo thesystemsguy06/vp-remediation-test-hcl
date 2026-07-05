@@ -54,10 +54,10 @@ resource "aws_api_gateway_method_settings" "vp_test" {
   method_path = "*/*"
 
   settings {
-    logging_level          = "OFF"
-    data_trace_enabled     = false
-    metrics_enabled        = false
-    cache_data_encrypted   = false
+    logging_level        = "OFF"
+    data_trace_enabled   = false
+    metrics_enabled      = false
+    cache_data_encrypted = false
   }
 }
 
@@ -102,3 +102,70 @@ resource "aws_apigatewayv2_stage" "vp_test" {
     Wave      = "1"
   }
 }
+
+# CloudWatch Log Group for API Gateway V2 Stage Access Logs
+resource "aws_cloudwatch_log_group" "vp_test_access_logs" {
+  name              = "/aws/apigateway/vp_test"
+  retention_in_days = 14
+
+  tags = {
+    Name       = "vp_test-apigateway-access-logs"
+    Purpose    = "API Gateway V2 Stage Access Logging"
+    Compliance = "SecurityHub-APIGateway.9"
+  }
+}
+
+# IAM Role for API Gateway CloudWatch Logs (Account-level)
+resource "aws_iam_role" "vp_test_apigateway_logs_role" {
+  name = "vp_test-apigateway-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "apigateway.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name       = "vp_test-apigateway-logs-role"
+    Purpose    = "API Gateway CloudWatch Logs Access"
+    Compliance = "SecurityHub-APIGateway.9"
+  }
+}
+
+# IAM Policy for API Gateway CloudWatch Logs
+resource "aws_iam_role_policy" "vp_test_apigateway_logs_policy" {
+  name = "vp_test-apigateway-logs-policy"
+  role = aws_iam_role.vp_test_apigateway_logs_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents",
+          "logs:GetLogEvents",
+          "logs:FilterLogEvents"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
+
+# API Gateway Account Configuration for CloudWatch Logs
+resource "aws_api_gateway_account" "vp_test_account" {
+  cloudwatch_role_arn = aws_iam_role.vp_test_apigateway_logs_role.arn
+}
+
