@@ -12,7 +12,7 @@ data "aws_caller_identity" "current_kms" {}
 resource "aws_kms_key" "vp_test" {
   description             = "VectorPlane E2E test — intentionally non-compliant"
   deletion_window_in_days = 7
-  enable_key_rotation     = false
+  enable_key_rotation     = true
 
   # Overly permissive key policy — triggers KMS.1
   policy = jsonencode({
