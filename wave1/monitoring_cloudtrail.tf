@@ -17,24 +17,7 @@ resource "aws_s3_bucket" "vp_test_cloudtrail" {
   force_destroy = true
 
   tags = var.common_tags_monitoring
-
-  lifecycle_rule {
-    enabled = true
-    id      = "cleanup"
-    expiration {
-      days = 90
-
-    }
-  }
 }
-
-resource "aws_s3_bucket_logging" "vp_test_cloudtrail_logging" {
-  bucket = aws_s3_bucket.vp_test_cloudtrail.id
-
-  target_bucket = aws_s3_bucket.vp_test_cloudtrail.id
-  target_prefix = "access-logs/"
-}
-
 
 resource "random_id" "ct_suffix" {
   byte_length = 4
@@ -74,7 +57,7 @@ resource "aws_cloudtrail" "vp_test" {
   name                       = "vp-test-insecure-trail"
   s3_bucket_name             = aws_s3_bucket.vp_test_cloudtrail.id
   is_multi_region_trail      = false
-  enable_log_file_validation = true
+  enable_log_file_validation = false
 
   # No kms_key_id — triggers CloudTrail.2
   # Single-region — triggers CloudTrail.1

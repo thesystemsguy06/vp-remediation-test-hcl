@@ -9,10 +9,6 @@
 resource "aws_ses_configuration_set" "vp_test" {
   name = "vp-test-insecure-ses"
   # No delivery_options with tls_policy — triggers SES.2
-
-  delivery_options {
-    tls_policy = "Require"
-  }
 }
 
 # SESv2 contact list — no tags — triggers SES.1
