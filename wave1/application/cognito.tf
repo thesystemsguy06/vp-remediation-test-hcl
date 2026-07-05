@@ -5,7 +5,8 @@
 #   Cognito.1 — User pools should have full-function advanced security enabled
 
 resource "aws_cognito_user_pool" "vp_test" {
-  name = "vp-test-insecure-pool"
+  deletion_protection = "ACTIVE"
+  name                = "vp-test-insecure-pool"
 
   password_policy {
     minimum_length    = 6
