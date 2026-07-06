@@ -41,6 +41,8 @@ resource "aws_dynamodb_table" "vp_test" {
   point_in_time_recovery {
     enabled = true
   }
+  deletion_protection_enabled = true
+
 }
 
 # DAX IAM role (needed for DAX cluster)
