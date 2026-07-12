@@ -18,6 +18,22 @@ resource "aws_s3_bucket" "p0_target" {
   bucket = "vp-e2e-p0-target-746210888062"
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "p0_target_lifecycle" {
+  bucket = aws_s3_bucket.p0_target.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
 # S3.1/S3.2/S3.3/S3.8 — block all public access (compliant)
 resource "aws_s3_bucket_public_access_block" "p0_target" {
   bucket                  = aws_s3_bucket.p0_target.id
