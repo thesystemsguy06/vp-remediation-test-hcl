@@ -29,6 +29,11 @@ resource "aws_cognito_user_pool" "vp_test" {
 
   user_pool_add_ons {
     advanced_security_mode = "ENFORCED"
+
+    # Cognito.4 — threat protection for CUSTOM authentication
+    advanced_security_additional_flows {
+      custom_auth_mode = "ENFORCED"
+    }
   }
 }
 
