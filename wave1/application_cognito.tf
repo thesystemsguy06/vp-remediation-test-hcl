@@ -7,6 +7,9 @@
 resource "aws_cognito_user_pool" "vp_test" {
   name = "vp-test-insecure-pool"
 
+  # Threat protection (advanced_security_mode) requires the PLUS tier
+  user_pool_tier = "PLUS"
+
   password_policy {
     minimum_length    = 6
     require_lowercase = false
