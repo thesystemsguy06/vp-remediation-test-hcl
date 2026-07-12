@@ -28,6 +28,56 @@ resource "aws_s3_bucket" "vp_test_data" {
   tags   = var.common_tags_storage
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "vp_test_data_lifecycle" {
+  bucket = aws_s3_bucket.vp_test_data.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_logging" "vp_test_data_logging" {
+  bucket = aws_s3_bucket.vp_test_data.id
+
+  target_bucket = aws_s3_bucket.vp_test_data.id
+  target_prefix = "access-logs/"
+}
+
+
+resource "aws_s3_bucket_policy" "vp_test_data_ssl" {
+  bucket = aws_s3_bucket.vp_test_data.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.vp_test_data.arn,
+          "${aws_s3_bucket.vp_test_data.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
 resource "random_id" "suffix" {
   byte_length = 4
 }
