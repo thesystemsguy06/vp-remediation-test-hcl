@@ -25,13 +25,15 @@ resource "aws_dynamodb_table" "vp_test" {
     type = "S"
   }
 
-  deletion_protection_enabled = false
+  # Remediated: DynamoDB.6 (deletion protection) + DynamoDB.2 (PITR)
+  deletion_protection_enabled = true
 
-  # PROVISIONED without auto-scaling — triggers DynamoDB.1
-  # No PITR — triggers DynamoDB.2
-  # Not in a backup plan — triggers DynamoDB.4
-  # No tags beyond test tags — triggers DynamoDB.5
-  # deletion_protection_enabled = false — triggers DynamoDB.6
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  # Still triggers: DynamoDB.1 (no auto-scaling), DynamoDB.4 (no backup plan),
+  # DynamoDB.5 (tagging — input_required)
 
   tags = {
     ManagedBy = "vectorplane-e2e-test"
