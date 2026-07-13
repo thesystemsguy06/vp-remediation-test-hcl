@@ -10,12 +10,13 @@ resource "aws_cognito_user_pool" "vp_test" {
   # Threat protection (advanced_security_mode) requires the PLUS tier
   user_pool_tier = "PLUS"
 
+  # Remediated: Cognito.3 (strong password policy) — ensure-value strengthened
   password_policy {
-    minimum_length    = 6
-    require_lowercase = false
-    require_numbers   = false
-    require_symbols   = false
-    require_uppercase = false
+    minimum_length    = 8
+    require_lowercase = true
+    require_numbers   = true
+    require_symbols   = true
+    require_uppercase = true
   }
 
   deletion_protection = "ACTIVE"
