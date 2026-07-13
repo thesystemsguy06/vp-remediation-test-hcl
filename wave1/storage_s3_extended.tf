@@ -94,10 +94,10 @@ resource "aws_s3_bucket_versioning" "vp_test_data" {
 resource "aws_s3_bucket_public_access_block" "vp_test_data" {
   bucket = aws_s3_bucket.vp_test_data.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 # No bucket policy enforcing SSL — triggers S3.5
@@ -114,10 +114,10 @@ resource "aws_s3_bucket" "vp_test_logs" {
 resource "aws_s3_bucket_public_access_block" "vp_test_logs" {
   bucket = aws_s3_bucket.vp_test_logs.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 # Access point with public access enabled — triggers S3.19
