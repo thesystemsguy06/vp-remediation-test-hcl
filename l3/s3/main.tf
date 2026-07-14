@@ -94,6 +94,22 @@ resource "aws_s3_bucket" "versioned" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "versioned_lifecycle" {
+  bucket = aws_s3_bucket.versioned.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
 resource "aws_s3_bucket_versioning" "versioned" {
   bucket = aws_s3_bucket.versioned.id
   versioning_configuration {
