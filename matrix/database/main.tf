@@ -83,7 +83,7 @@ resource "aws_redshift_cluster" "rs" {
   cluster_subnet_group_name           = aws_redshift_subnet_group.rs.name
   publicly_accessible                 = false # violation -> Redshift.1
   encrypted                           = false # violation
-  enhanced_vpc_routing                = false # violation -> Redshift.7
+  enhanced_vpc_routing                = true  # violation -> Redshift.7
   automated_snapshot_retention_period = 1     # ra3 forbids 0; 1 is min (may still trip Redshift.3 if it wants >=7)
   allow_version_upgrade               = false # violation -> Redshift.6
   skip_final_snapshot                 = true
