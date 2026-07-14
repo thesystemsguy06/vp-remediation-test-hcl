@@ -65,7 +65,7 @@ resource "aws_cloudtrail" "vp_test" {
   name                       = "vp-test-insecure-trail"
   s3_bucket_name             = aws_s3_bucket.vp_test_cloudtrail.id
   is_multi_region_trail      = false
-  enable_log_file_validation = false
+  enable_log_file_validation = true
 
   # No kms_key_id — triggers CloudTrail.2
   # Single-region — triggers CloudTrail.1
