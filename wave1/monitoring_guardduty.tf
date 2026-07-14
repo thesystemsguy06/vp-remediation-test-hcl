@@ -47,6 +47,13 @@ resource "aws_guardduty_detector" "vp_test" {
   tags = var.common_tags_monitoring_gd
 }
 
+resource "aws_guardduty_detector_feature" "vp_test_s3_protection" {
+  detector_id = aws_guardduty_detector.vp_test.id
+  name        = "S3_DATA_EVENTS"
+  status      = "ENABLED"
+}
+
+
 # Filter with no tags — triggers GuardDuty.2
 resource "aws_guardduty_filter" "vp_test" {
   name        = "vp-test-insecure-filter"
