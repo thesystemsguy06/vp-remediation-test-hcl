@@ -21,6 +21,15 @@ resource "aws_s3_bucket" "bare" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_versioning" "bare_versioning" {
+  bucket = aws_s3_bucket.bare.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
 resource "aws_s3_bucket_logging" "bare_logging" {
   bucket = aws_s3_bucket.bare.id
 
