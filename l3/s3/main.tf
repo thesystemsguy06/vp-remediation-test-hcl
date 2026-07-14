@@ -21,6 +21,17 @@ resource "aws_s3_bucket" "bare" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_notification" "bare_notification" {
+  bucket = aws_s3_bucket.bare.id
+
+  topic {
+    topic_arn     = aws_sns_topic.s3_notification.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".log"
+  }
+}
+
+
 resource "aws_s3_bucket_versioning" "bare_versioning" {
   bucket = aws_s3_bucket.bare.id
 
