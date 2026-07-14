@@ -35,15 +35,15 @@ resource "aws_codebuild_project" "vp_test" {
   }
 
   environment {
-    compute_type    = "BUILD_GENERAL1_SMALL"
-    image           = "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
-    type            = "LINUX_CONTAINER"
+    compute_type    = "BUILD_GENERAL1_MEDIUM"
+    image           = "aws/codebuild/standard:5.0"
+    type            = "SECRETS_MANAGER"
     privileged_mode = true
 
     # Plaintext credential — triggers CodeBuild.7
     environment_variable {
-      name  = "AWS_ACCESS_KEY_ID"
-      value = "AKIAIOSFODNN7EXAMPLE"
+      name  = "API_KEY"
+      value = "prod/myapp/api_key"
       type  = "PLAINTEXT"
     }
   }
