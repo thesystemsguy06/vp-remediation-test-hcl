@@ -25,6 +25,14 @@ resource "aws_s3_bucket" "bare" {
   force_destroy           = true
 }
 
+resource "aws_s3_bucket_logging" "bare_logging" {
+  bucket = aws_s3_bucket.bare.id
+
+  target_bucket = aws_s3_bucket.bare.id
+  target_prefix = "access-logs/"
+}
+
+
 resource "aws_s3_bucket_policy" "bare_ssl" {
   bucket = aws_s3_bucket.bare.id
 
