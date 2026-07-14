@@ -189,6 +189,32 @@ resource "aws_s3_bucket" "replication" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_policy" "replication_ssl" {
+  bucket = aws_s3_bucket.replication.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.replication.arn,
+          "${aws_s3_bucket.replication.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
 output "l3_s3_buckets" {
   value = {
     bare        = aws_s3_bucket.bare.bucket
