@@ -156,6 +156,32 @@ resource "aws_s3_bucket" "versioned" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_policy" "versioned_ssl" {
+  bucket = aws_s3_bucket.versioned.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.versioned.arn,
+          "${aws_s3_bucket.versioned.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
 resource "aws_s3_bucket_lifecycle_configuration" "versioned_lifecycle" {
   bucket = aws_s3_bucket.versioned.id
 
