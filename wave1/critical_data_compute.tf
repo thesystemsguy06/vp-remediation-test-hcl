@@ -32,15 +32,17 @@ resource "aws_db_instance" "critical" {
   db_subnet_group_name = aws_db_subnet_group.critical.name
   vpc_security_group_ids = [aws_security_group.critical_open.id]
 
-  # Intentionally non-compliant:
-  publicly_accessible          = true  # RDS.2
-  deletion_protection          = false # RDS.8
-  backup_retention_period      = 0     # RDS.11
-  auto_minor_version_upgrade   = false # RDS.13
-  copy_tags_to_snapshot        = false # RDS.17
-  storage_encrypted            = false # RDS.3 (replacement-required)
-  iam_database_authentication_enabled = false # RDS.10
-  # No enabled_cloudwatch_logs_exports — RDS.9
+  # REMEDIATED to match VP snippet renders (in-place controls):
+  publicly_accessible          = false # RDS.2  (sh_rds_2)
+  deletion_protection          = true  # RDS.8  (sh_rds_8)
+  backup_retention_period      = 7     # RDS.11 (sh_rds_11)
+  auto_minor_version_upgrade   = true  # RDS.13 (sh_rds_13)
+  copy_tags_to_snapshot        = true  # RDS.17 (sh_rds_17)
+  # multi_az (RDS.5) deferred — AWS InsufficientDBInstanceCapacity in this AZ (environmental, not a snippet issue). Render is correct: multi_az = true.
+  iam_database_authentication_enabled = true # RDS.10 (sh_rds_10)
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"] # RDS.9/RDS.36 (sh_rds_6/enable_cloudwatch_log_exports)
+  # storage_encrypted stays false — RDS.3 is replacement-required (advisory, migrate_rds_encryption playbook)
+  storage_encrypted            = false # RDS.3 (NOT auto-remediated by design)
 
   skip_final_snapshot = true
   apply_immediately   = true
@@ -71,7 +73,7 @@ resource "aws_instance" "critical" {
   subnet_id     = data.aws_subnets.default.ids[0]
 
   metadata_options {
-    http_tokens = "optional" # EC2.8 — should be "required" (IMDSv2)
+    http_tokens = "required" # EC2.8 — REMEDIATED to IMDSv2 (ensure_set http_tokens)
   }
 
   tags = { Name = "vp-test-critical-ec2", ManagedBy = "vectorplane-e2e-test", Wave = "1" }
