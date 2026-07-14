@@ -21,6 +21,32 @@ resource "aws_s3_bucket" "bare" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_policy" "bare_ssl" {
+  bucket = aws_s3_bucket.bare.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.bare.arn,
+          "${aws_s3_bucket.bare.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
 resource "aws_s3_bucket_lifecycle_configuration" "bare_lifecycle" {
   bucket = aws_s3_bucket.bare.id
 
