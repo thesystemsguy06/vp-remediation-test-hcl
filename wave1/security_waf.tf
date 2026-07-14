@@ -42,6 +42,28 @@ resource "aws_wafv2_web_acl" "vp_test" {
   # cloudwatch_metrics_enabled = false — triggers WAF.12
 
   tags = var.common_tags_security
+
+  rule {
+    name     = "AWSManagedRulesCommonRuleSet"
+    priority = 1
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "friendlyRuleName"
+      sampled_requests_enabled   = false
+    }
+  }
 }
 
 # WAFv2 rule group — empty
