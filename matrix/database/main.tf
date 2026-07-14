@@ -43,19 +43,19 @@ resource "aws_db_subnet_group" "aurora" {
 }
 
 resource "aws_rds_cluster" "aurora" {
-  cluster_identifier              = "vp-matrix-aurora-${random_id.s.hex}"
-  engine                          = "aurora-mysql"
-  engine_version                  = "8.0.mysql_aurora.3.12.0"
-  master_username                 = "vpadmin"
-  master_password                 = random_password.master.result
-  db_subnet_group_name            = aws_db_subnet_group.aurora.name
-  skip_final_snapshot             = true
-  backup_retention_period         = 1
-  deletion_protection             = false # violation
+  cluster_identifier                  = "vp-matrix-aurora-${random_id.s.hex}"
+  engine                              = "aurora-mysql"
+  engine_version                      = "8.0.mysql_aurora.3.12.0"
+  master_username                     = "vpadmin"
+  master_password                     = random_password.master.result
+  db_subnet_group_name                = aws_db_subnet_group.aurora.name
+  skip_final_snapshot                 = true
+  backup_retention_period             = 1
+  deletion_protection                 = false # violation
   iam_database_authentication_enabled = false # violation -> RDS.12
-  copy_tags_to_snapshot           = false # violation
+  copy_tags_to_snapshot               = false # violation
   # no enabled_cloudwatch_logs_exports -> RDS.34
-  apply_immediately               = true
+  apply_immediately = true
 }
 
 # -----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ resource "aws_redshift_cluster" "rs" {
   node_type                           = "ra3.large"
   cluster_type                        = "single-node"
   cluster_subnet_group_name           = aws_redshift_subnet_group.rs.name
-  publicly_accessible                 = true  # violation -> Redshift.1
+  publicly_accessible                 = false # violation -> Redshift.1
   encrypted                           = false # violation
   enhanced_vpc_routing                = false # violation -> Redshift.7
   automated_snapshot_retention_period = 1     # ra3 forbids 0; 1 is min (may still trip Redshift.3 if it wants >=7)
