@@ -24,4 +24,8 @@ resource "aws_appsync_graphql_api" "vp_test" {
     ManagedBy = "vectorplane-e2e-test"
     Wave      = "1"
   }
+
+  log_config {
+    field_log_level = "ERROR"
+  }
 }
