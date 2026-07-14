@@ -21,6 +21,63 @@ resource "aws_s3_bucket" "bare" {
   force_destroy = true
 }
 
+data "aws_caller_identity" "current" {}
+
+# S3 Event Notifications remediation for SecurityHub S3.11
+
+# SNS Topic for S3 event notifications
+resource "aws_sns_topic" "bare_events" {
+  name = "bare-s3-events"
+
+  tags = {
+    Name    = "bare-s3-events"
+    Purpose = "S3 event notifications"
+  }
+}
+
+# SNS Topic Policy to allow S3 to publish
+resource "aws_sns_topic_policy" "bare_events" {
+  arn = aws_sns_topic.bare_events.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowS3Publish"
+        Effect = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action   = "SNS:Publish"
+        Resource = aws_sns_topic.bare_events.arn
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
+}
+
+# S3 Bucket Notification configuration
+resource "aws_s3_bucket_notification" "bare" {
+  bucket = aws_s3_bucket.bare.id
+
+  topic {
+    topic_arn = aws_sns_topic.bare_events.arn
+    events = [
+      "s3:ObjectCreated:*",
+      "s3:ObjectRemoved:*"
+    ]
+  }
+
+  depends_on = [aws_sns_topic_policy.bare_events]
+}
+
+
+
+
 resource "aws_s3_bucket_versioning" "bare_versioning" {
   bucket = aws_s3_bucket.bare.id
 
