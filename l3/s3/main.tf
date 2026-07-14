@@ -74,10 +74,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "bare_lifecycle" {
 # Explicit all-false PAB → definitively violates S3.8 (don't rely on account BPA).
 resource "aws_s3_bucket_public_access_block" "bare" {
   bucket                  = aws_s3_bucket.bare.id
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 # -----------------------------------------------------------------------------
