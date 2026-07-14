@@ -35,7 +35,7 @@ resource "aws_api_gateway_stage" "vp_test" {
   rest_api_id   = aws_api_gateway_rest_api.vp_test.id
   stage_name    = "test"
 
-  xray_tracing_enabled = false
+  xray_tracing_enabled = true
 
   # No access_log_settings — triggers APIGateway.1
   # No client_certificate_id — triggers APIGateway.2
@@ -54,10 +54,10 @@ resource "aws_api_gateway_method_settings" "vp_test" {
   method_path = "*/*"
 
   settings {
-    logging_level          = "OFF"
-    data_trace_enabled     = false
-    metrics_enabled        = false
-    cache_data_encrypted   = false
+    logging_level        = "OFF"
+    data_trace_enabled   = false
+    metrics_enabled      = false
+    cache_data_encrypted = false
   }
 }
 
