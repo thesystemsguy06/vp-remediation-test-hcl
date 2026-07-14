@@ -17,12 +17,8 @@ resource "random_id" "s" {
 # logging), S3.13 (lifecycle), S3.14 (versioning).
 # -----------------------------------------------------------------------------
 resource "aws_s3_bucket" "bare" {
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-  bucket                  = "vp-l3-s3-bare-${random_id.s.hex}"
-  force_destroy           = true
+  bucket        = "vp-l3-s3-bare-${random_id.s.hex}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_logging" "bare_logging" {
