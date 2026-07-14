@@ -21,6 +21,22 @@ resource "aws_s3_bucket" "bare" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "bare_lifecycle" {
+  bucket = aws_s3_bucket.bare.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
 # Explicit all-false PAB → definitively violates S3.8 (don't rely on account BPA).
 resource "aws_s3_bucket_public_access_block" "bare" {
   bucket                  = aws_s3_bucket.bare.id
