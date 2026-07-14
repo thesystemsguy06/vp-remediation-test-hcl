@@ -1,0 +1,66 @@
+# =============================================================================
+# L3 S3 pilot — purpose-built VIOLATING buckets.
+# Each bucket carries a subset of S3 findings; in aggregate they exercise the
+# S3 crown-jewel snippets end-to-end (deploy -> SH finding -> VP remediate ->
+# PR -> apply -> SH PASS). See docs/testing/L3_E2E_COVERAGE_MAP.md.
+# Nothing here is "secure by omission" — violations are explicit so SH scores
+# them reliably rather than relying on account defaults.
+# =============================================================================
+
+resource "random_id" "s" {
+  byte_length = 4
+}
+
+# -----------------------------------------------------------------------------
+# bare — no SSL policy, public-access-block all FALSE, no logging/versioning/
+# lifecycle. Targets: S3.5 (SSL), S3.8 (block public access), S3.9 (access
+# logging), S3.13 (lifecycle), S3.14 (versioning).
+# -----------------------------------------------------------------------------
+resource "aws_s3_bucket" "bare" {
+  bucket        = "vp-l3-s3-bare-${random_id.s.hex}"
+  force_destroy = true
+}
+
+# Explicit all-false PAB → definitively violates S3.8 (don't rely on account BPA).
+resource "aws_s3_bucket_public_access_block" "bare" {
+  bucket                  = aws_s3_bucket.bare.id
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+# -----------------------------------------------------------------------------
+# versioned_nolifecycle — versioning ON but NO lifecycle. Targets S3.10
+# (versioned buckets must have a lifecycle policy) — only violatable when
+# versioning is enabled, which is why it needs its own bucket.
+# -----------------------------------------------------------------------------
+resource "aws_s3_bucket" "versioned" {
+  bucket        = "vp-l3-s3-versioned-${random_id.s.hex}"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_versioning" "versioned" {
+  bucket = aws_s3_bucket.versioned.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# -----------------------------------------------------------------------------
+# replication — plain bucket with no cross-region replication and no CMK SSE.
+# Targets S3.7 (CRR) and S3.17 (KMS CMK encryption). Both TIER-B — the pilot
+# confirms whether SH scores them.
+# -----------------------------------------------------------------------------
+resource "aws_s3_bucket" "replication" {
+  bucket        = "vp-l3-s3-replication-${random_id.s.hex}"
+  force_destroy = true
+}
+
+output "l3_s3_buckets" {
+  value = {
+    bare        = aws_s3_bucket.bare.bucket
+    versioned   = aws_s3_bucket.versioned.bucket
+    replication = aws_s3_bucket.replication.bucket
+  }
+}
