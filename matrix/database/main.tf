@@ -74,6 +74,7 @@ resource "aws_redshift_subnet_group" "rs" {
 }
 
 resource "aws_redshift_cluster" "rs" {
+  logging                             = true
   cluster_identifier                  = "vp-matrix-rs-${random_id.s.hex}"
   database_name                       = "vpdb"
   master_username                     = "vpadmin"
