@@ -152,7 +152,7 @@ resource "aws_db_instance" "pg" {
   skip_final_snapshot                 = true
   storage_encrypted                   = true
   publicly_accessible                 = false
-  deletion_protection                 = false # violation -> RDS.8
+  deletion_protection                 = true  # violation -> RDS.8
   backup_retention_period             = 0     # violation -> RDS.11
   iam_database_authentication_enabled = false # violation -> RDS.10
   auto_minor_version_upgrade          = false # violation -> RDS.13
