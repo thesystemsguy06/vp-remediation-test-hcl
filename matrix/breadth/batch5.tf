@@ -18,7 +18,7 @@ resource "aws_security_group" "vp_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
 
   ingress {
@@ -26,7 +26,7 @@ resource "aws_security_group" "vp_sg" {
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
 
   egress {
