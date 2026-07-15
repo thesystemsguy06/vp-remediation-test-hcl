@@ -116,13 +116,13 @@ resource "aws_elasticache_replication_group" "ec" {
   replication_group_id       = "vp-matrix-ec-${random_id.s.hex}"
   description                = "vp matrix elasticache violating"
   node_type                  = "cache.t3.micro"
-  num_cache_clusters         = 1
+  num_cache_clusters         = 2
   engine                     = "redis"
   subnet_group_name          = aws_elasticache_subnet_group.ec.name
   transit_encryption_enabled = false # violation
   at_rest_encryption_enabled = false # violation
   auto_minor_version_upgrade = false # violation -> ElastiCache.2
-  automatic_failover_enabled = false # violation -> ElastiCache.3
+  automatic_failover_enabled = true  # violation -> ElastiCache.3
   snapshot_retention_limit   = 0     # violation -> ElastiCache.1
   apply_immediately          = true
 }
