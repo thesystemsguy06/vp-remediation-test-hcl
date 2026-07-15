@@ -74,22 +74,29 @@ resource "aws_redshift_subnet_group" "rs" {
 }
 
 resource "aws_redshift_cluster" "rs" {
-  multi_az                            = true
-  logging                             = true
-  cluster_identifier                  = "vp-matrix-rs-${random_id.s.hex}"
-  database_name                       = "vpdb"
-  master_username                     = "vpadmin"
-  master_password                     = "${random_password.master.result}Aa1"
-  node_type                           = "ra3.large"
-  cluster_type                        = "single-node"
-  cluster_subnet_group_name           = aws_redshift_subnet_group.rs.name
-  publicly_accessible                 = false # violation -> Redshift.1
-  encrypted                           = false # violation
-  enhanced_vpc_routing                = true  # violation -> Redshift.7
-  automated_snapshot_retention_period = 7     # ra3 forbids 0; 1 is min (may still trip Redshift.3 if it wants >=7)
-  allow_version_upgrade               = true  # violation -> Redshift.6
-  skip_final_snapshot                 = true
-  apply_immediately                   = true
+  multi_az                             = false # Redshift.18 not in-place remediable for single-node ra3 (AWS rejects multi-AZ)
+  cluster_identifier                   = "vp-matrix-rs-${random_id.s.hex}"
+  database_name                        = "vpdb"
+  master_username                      = "vpadmin"
+  master_password                      = "${random_password.master.result}Aa1"
+  node_type                            = "ra3.large"
+  cluster_type                         = "single-node"
+  cluster_subnet_group_name            = aws_redshift_subnet_group.rs.name
+  publicly_accessible                  = false
+  encrypted                            = true # ra3 forces encryption; align HCL to reality
+  availability_zone_relocation_enabled = true # AWS default for ra3; align to stop drift
+  enhanced_vpc_routing                 = true
+  automated_snapshot_retention_period  = 7
+  allow_version_upgrade                = true
+  skip_final_snapshot                  = true
+  apply_immediately                    = true
+
+  # Redshift.4 audit logging (the sh_redshift_4 remediation render)
+  logging {
+    enable               = true
+    log_destination_type = "cloudwatch"
+    log_exports          = ["connectionlog", "useractivitylog", "userlog"]
+  }
 }
 
 # -----------------------------------------------------------------------------
