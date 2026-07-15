@@ -19,6 +19,31 @@ resource "aws_s3_bucket" "vp_test_cloudtrail" {
   tags = var.common_tags_monitoring
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "vp_test_cloudtrail_lifecycle" {
+  bucket = aws_s3_bucket.vp_test_cloudtrail.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_versioning" "vp_test_cloudtrail_versioning" {
+  bucket = aws_s3_bucket.vp_test_cloudtrail.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
 resource "aws_s3_bucket_logging" "vp_test_cloudtrail_logging" {
   bucket = aws_s3_bucket.vp_test_cloudtrail.id
 

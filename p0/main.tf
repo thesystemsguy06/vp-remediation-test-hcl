@@ -16,7 +16,34 @@
 
 resource "aws_s3_bucket" "p0_target" {
   bucket = "vp-e2e-p0-target-746210888062"
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
+
+resource "aws_s3_bucket_versioning" "p0_target_versioning" {
+  bucket = aws_s3_bucket.p0_target.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
+resource "aws_s3_bucket_logging" "p0_target_logging" {
+  bucket = aws_s3_bucket.p0_target.id
+
+  target_bucket = aws_s3_bucket.p0_target.id
+  target_prefix = "access-logs/"
+}
+
 
 resource "aws_s3_bucket_lifecycle_configuration" "p0_target_lifecycle" {
   bucket = aws_s3_bucket.p0_target.id
