@@ -67,7 +67,7 @@ resource "aws_kms_key" "vp_kms" {
 # ---- SQS: SQS.1 (encryption at rest) ----------------------------------------
 resource "aws_sqs_queue" "vp_sqs" {
   name                    = "vp-breadth-sqs-${local.sfx}"
-  sqs_managed_sse_enabled = false # SQS.1 violation
+  sqs_managed_sse_enabled = true # SQS.1 violation
 }
 
 # ---- SNS: SNS.1 (encryption at rest) ----------------------------------------
