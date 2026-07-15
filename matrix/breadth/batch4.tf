@@ -11,7 +11,7 @@
 # ---- ENI: EC2.180 (source/dest check) ---------------------------------------
 resource "aws_network_interface" "vp_ec2" {
   subnet_id         = aws_subnet.vp_ec2.id
-  source_dest_check = false # EC2.180 violation
+  source_dest_check = true # EC2.180 violation
   tags              = { Name = "vp-breadth-eni-${local.sfx}" }
 }
 
@@ -22,11 +22,11 @@ resource "aws_launch_template" "vp_ec2" {
   instance_type = "t3.micro"
 
   metadata_options {
-    http_tokens = "optional" # EC2.170 violation (not IMDSv2)
+    http_tokens = "required" # EC2.170 violation (not IMDSv2)
   }
 
   network_interfaces {
-    associate_public_ip_address = true # EC2.25 violation
+    associate_public_ip_address = false # EC2.25 violation
   }
 
   block_device_mappings {
@@ -42,7 +42,7 @@ resource "aws_instance" "vp_ec2_pub" {
   ami                         = data.aws_ami.vp_al2.id
   instance_type               = "t3.micro"
   subnet_id                   = aws_subnet.vp_ec2.id
-  associate_public_ip_address = true # EC2.9 violation (has public IP)
+  associate_public_ip_address = false # EC2.9 violation (has public IP)
 
   metadata_options {
     http_tokens = "required" # keep EC2.8 compliant here
