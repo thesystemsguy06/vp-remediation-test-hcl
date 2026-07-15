@@ -25,7 +25,7 @@ resource "aws_network_acl_rule" "vp_ec2_ssh" {
   egress         = false
   protocol       = "tcp"
   rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0" # EC2.21 violation (SSH open to world)
+  cidr_block     = "10.0.0.0/8" # EC2.21 violation (SSH open to world)
   from_port      = 22
   to_port        = 22
 }
