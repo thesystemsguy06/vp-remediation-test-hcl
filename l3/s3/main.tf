@@ -19,6 +19,16 @@ resource "random_id" "s" {
 resource "aws_s3_bucket" "bare" {
   bucket        = "vp-l3-s3-bare-${random_id.s.hex}"
   force_destroy = true
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
 
 data "aws_caller_identity" "current" {}
@@ -154,7 +164,43 @@ resource "aws_s3_bucket_public_access_block" "bare" {
 resource "aws_s3_bucket" "versioned" {
   bucket        = "vp-l3-s3-versioned-${random_id.s.hex}"
   force_destroy = true
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
+
+resource "aws_s3_bucket_policy" "versioned_ssl" {
+  bucket = aws_s3_bucket.versioned.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.versioned.arn,
+          "${aws_s3_bucket.versioned.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
 
 resource "aws_s3_bucket_lifecycle_configuration" "versioned_lifecycle" {
   bucket = aws_s3_bucket.versioned.id
@@ -187,7 +233,76 @@ resource "aws_s3_bucket_versioning" "versioned" {
 resource "aws_s3_bucket" "replication" {
   bucket        = "vp-l3-s3-replication-${random_id.s.hex}"
   force_destroy = true
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
+
+resource "aws_s3_bucket_policy" "replication_ssl" {
+  bucket = aws_s3_bucket.replication.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.replication.arn,
+          "${aws_s3_bucket.replication.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
+resource "aws_s3_bucket_versioning" "replication_versioning" {
+  bucket = aws_s3_bucket.replication.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
+resource "aws_s3_bucket_lifecycle_configuration" "replication_lifecycle" {
+  bucket = aws_s3_bucket.replication.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_logging" "replication_logging" {
+  bucket = aws_s3_bucket.replication.id
+
+  target_bucket = aws_s3_bucket.replication.id
+  target_prefix = "access-logs/"
+}
+
 
 output "l3_s3_buckets" {
   value = {
