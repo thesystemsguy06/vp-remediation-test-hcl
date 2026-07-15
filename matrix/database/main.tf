@@ -154,7 +154,7 @@ resource "aws_db_instance" "pg" {
   publicly_accessible                 = false
   deletion_protection                 = true  # violation -> RDS.8
   backup_retention_period             = 0     # violation -> RDS.11
-  iam_database_authentication_enabled = false # violation -> RDS.10
+  iam_database_authentication_enabled = true  # violation -> RDS.10
   auto_minor_version_upgrade          = false # violation -> RDS.13
   # no monitoring_interval             -> RDS.6 (enhanced monitoring)
   # no enabled_cloudwatch_logs_exports -> RDS.9 (publish logs)
