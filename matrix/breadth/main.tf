@@ -13,7 +13,7 @@ locals {
 # ---- EFS: EFS.1 (encrypt at rest), EFS.2 (automatic backups) ----------------
 resource "aws_efs_file_system" "vp_efs" {
   creation_token = "vp-breadth-efs-${local.sfx}"
-  encrypted      = false # EFS.1 violation
+  encrypted      = true # EFS.1 violation
   # no aws_efs_backup_policy companion -> EFS.2 violation
 }
 
@@ -29,12 +29,16 @@ resource "aws_dynamodb_table" "vp_ddb" {
   }
   # no point_in_time_recovery block -> DynamoDB.2 violation
   # deletion_protection_enabled defaults false -> DynamoDB.6 violation
+
+  point_in_time_recovery {
+    enabled = true
+  }
 }
 
 # ---- ECR: ECR.1 (scan on push), ECR.2 (tag immutability), ECR.3 (lifecycle) -
 resource "aws_ecr_repository" "vp_ecr" {
   name                 = "vp-breadth-ecr-${local.sfx}"
-  image_tag_mutability = "MUTABLE" # ECR.2 violation
+  image_tag_mutability = "IMMUTABLE" # ECR.2 violation
 
   image_scanning_configuration {
     scan_on_push = false # ECR.1 violation
@@ -44,9 +48,10 @@ resource "aws_ecr_repository" "vp_ecr" {
 
 # ---- Kinesis: Kinesis.1 (server-side encryption) ----------------------------
 resource "aws_kinesis_stream" "vp_kinesis" {
+  encryption_type  = KMS
   name             = "vp-breadth-kinesis-${local.sfx}"
   shard_count      = 1
-  retention_period = 24
+  retention_period = 168
   # no encryption_type -> Kinesis.1 violation (defaults to NONE)
 }
 
@@ -65,7 +70,8 @@ resource "aws_sqs_queue" "vp_sqs" {
 
 # ---- SNS: SNS.1 (encryption at rest) ----------------------------------------
 resource "aws_sns_topic" "vp_sns" {
-  name = "vp-breadth-sns-${local.sfx}"
+  kms_master_key_id = "alias/aws/sns"
+  name              = "vp-breadth-sns-${local.sfx}"
   # no kms_master_key_id -> SNS.1 violation
 }
 
