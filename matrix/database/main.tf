@@ -139,6 +139,7 @@ resource "aws_elasticache_replication_group" "ec" {
 #   - auto_minor_version_upgrade = false  -> RDS.13
 # -----------------------------------------------------------------------------
 resource "aws_db_instance" "pg" {
+  enabled_cloudwatch_logs_exports     = ["postgresql", "upgrade"]
   monitoring_interval                 = 60
   monitoring_role_arn                 = "arn:aws:iam::746210888062:role/vp-rds-monitoring-role"
   identifier                          = "vp-matrix-pg-${random_id.s.hex}"
