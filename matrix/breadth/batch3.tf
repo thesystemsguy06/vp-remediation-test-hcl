@@ -17,7 +17,7 @@ resource "aws_subnet" "vp_ec2" {
   vpc_id                  = data.aws_vpc.vp_ec2.id
   cidr_block              = "172.31.128.0/24" # free block in the default VPC
   availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = true # EC2.15 violation
+  map_public_ip_on_launch = false # EC2.15 violation
   tags                    = { Name = "vp-breadth-subnet-${local.sfx}" }
 }
 
@@ -40,6 +40,10 @@ resource "aws_instance" "vp_ec2" {
   associate_public_ip_address = false # keep EC2.9 compliant (no public IP)
   # no metadata_options block  -> http_tokens defaults to "optional" -> EC2.8 violation
   tags = { Name = "vp-breadth-ec2-${local.sfx}" }
+
+  metadata_options {
+    http_tokens = "required"
+  }
 }
 
 output "breadth_batch3" {
