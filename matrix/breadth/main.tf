@@ -19,9 +19,10 @@ resource "aws_efs_file_system" "vp_efs" {
 
 # ---- DynamoDB: DynamoDB.2 (PITR), DynamoDB.6 (deletion protection) ----------
 resource "aws_dynamodb_table" "vp_ddb" {
-  name         = "vp-breadth-ddb-${local.sfx}"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
+  deletion_protection_enabled = true
+  name                        = "vp-breadth-ddb-${local.sfx}"
+  billing_mode                = "PAY_PER_REQUEST"
+  hash_key                    = "id"
 
   attribute {
     name = "id"
@@ -59,7 +60,7 @@ resource "aws_kinesis_stream" "vp_kinesis" {
 # ---- KMS: KMS.4 (key rotation) ----------------------------------------------
 resource "aws_kms_key" "vp_kms" {
   description             = "vp-breadth-kms-${local.sfx}"
-  enable_key_rotation     = false # KMS.4 violation
+  enable_key_rotation     = true # KMS.4 violation
   deletion_window_in_days = 7
 }
 
@@ -78,14 +79,25 @@ resource "aws_sns_topic" "vp_sns" {
 
 # ---- Cognito: Cognito.3 (strong password policy) ----------------------------
 resource "aws_cognito_user_pool" "vp_cognito" {
-  name = "vp-breadth-cognito-${local.sfx}"
+  mfa_configuration   = "ON"
+  user_pool_tier      = "PLUS"
+  deletion_protection = "ACTIVE"
+  name                = "vp-breadth-cognito-${local.sfx}"
 
   password_policy {
-    minimum_length    = 6 # Cognito.3 violation (weak policy)
-    require_lowercase = false
-    require_numbers   = false
-    require_symbols   = false
-    require_uppercase = false
+    minimum_length    = 8 # Cognito.3 violation (weak policy)
+    require_lowercase = true
+    require_numbers   = true
+    require_symbols   = true
+    require_uppercase = true
+  }
+
+  user_pool_add_ons {
+    advanced_security_mode = "ENFORCED"
+  }
+
+  software_token_mfa_configuration {
+    enabled = true
   }
 }
 
