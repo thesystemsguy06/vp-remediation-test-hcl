@@ -19,7 +19,45 @@ resource "random_id" "s" {
 resource "aws_s3_bucket" "bare" {
   bucket        = "vp-l3-s3-bare-${random_id.s.hex}"
   force_destroy = true
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "bare_encryption" {
+  bucket = aws_s3_bucket.bare.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = { input : kms_key_arn }
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_replication_configuration" "bare_replication" {
+  role   = { input : iam_role_arn }
+  bucket = aws_s3_bucket.bare.id
+
+  rule {
+    id     = "fad12f91a44-45e8-9c69-c2176a6d4e24"
+    status = "Enabled"
+
+    destination {
+      bucket        = aws_s3_bucket.destination.arn
+      storage_class = "STANDARD"
+    }
+  }
+}
+
 
 data "aws_caller_identity" "current" {}
 
@@ -154,7 +192,55 @@ resource "aws_s3_bucket_public_access_block" "bare" {
 resource "aws_s3_bucket" "versioned" {
   bucket        = "vp-l3-s3-versioned-${random_id.s.hex}"
   force_destroy = true
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
+
+resource "aws_s3_bucket_policy" "versioned_ssl" {
+  bucket = aws_s3_bucket.versioned.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.versioned.arn,
+          "${aws_s3_bucket.versioned.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "versioned_encryption" {
+  bucket = aws_s3_bucket.versioned.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = { input : kms_key_arn }
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
 
 resource "aws_s3_bucket_lifecycle_configuration" "versioned_lifecycle" {
   bucket = aws_s3_bucket.versioned.id
@@ -187,7 +273,88 @@ resource "aws_s3_bucket_versioning" "versioned" {
 resource "aws_s3_bucket" "replication" {
   bucket        = "vp-l3-s3-replication-${random_id.s.hex}"
   force_destroy = true
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
+
+resource "aws_s3_bucket_policy" "replication_ssl" {
+  bucket = aws_s3_bucket.replication.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.replication.arn,
+          "${aws_s3_bucket.replication.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "replication_encryption" {
+  bucket = aws_s3_bucket.replication.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = { input : kms_key_arn }
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_versioning" "replication_versioning" {
+  bucket = aws_s3_bucket.replication.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
+resource "aws_s3_bucket_lifecycle_configuration" "replication_lifecycle" {
+  bucket = aws_s3_bucket.replication.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_logging" "replication_logging" {
+  bucket = aws_s3_bucket.replication.id
+
+  target_bucket = aws_s3_bucket.replication.id
+  target_prefix = "access-logs/"
+}
+
 
 output "l3_s3_buckets" {
   value = {

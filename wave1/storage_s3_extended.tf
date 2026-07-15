@@ -26,7 +26,29 @@ variable "common_tags_storage" {
 resource "aws_s3_bucket" "vp_test_data" {
   bucket = "vp-e2e-test-data-${random_id.suffix.hex}"
   tags   = var.common_tags_storage
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "vp_test_data_encryption" {
+  bucket = aws_s3_bucket.vp_test_data.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = { input : kms_key_arn }
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
 
 resource "aws_s3_bucket_lifecycle_configuration" "vp_test_data_lifecycle" {
   bucket = aws_s3_bucket.vp_test_data.id
@@ -86,7 +108,7 @@ resource "random_id" "suffix" {
 resource "aws_s3_bucket_versioning" "vp_test_data" {
   bucket = aws_s3_bucket.vp_test_data.id
   versioning_configuration {
-    status = "Suspended"
+    status = "Enabled"
   }
 }
 
@@ -110,6 +132,77 @@ resource "aws_s3_bucket" "vp_test_logs" {
   bucket = "vp-e2e-test-logs-${random_id.suffix.hex}"
   tags   = var.common_tags_storage
 }
+
+resource "aws_s3_bucket_policy" "vp_test_logs_ssl" {
+  bucket = aws_s3_bucket.vp_test_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.vp_test_logs.arn,
+          "${aws_s3_bucket.vp_test_logs.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "vp_test_logs_encryption" {
+  bucket = aws_s3_bucket.vp_test_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = { input : kms_key_arn }
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_lifecycle_configuration" "vp_test_logs_lifecycle" {
+  bucket = aws_s3_bucket.vp_test_logs.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_versioning" "vp_test_logs_versioning" {
+  bucket = aws_s3_bucket.vp_test_logs.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
+resource "aws_s3_bucket_logging" "vp_test_logs_logging" {
+  bucket = aws_s3_bucket.vp_test_logs.id
+
+  target_bucket = aws_s3_bucket.vp_test_logs.id
+  target_prefix = "access-logs/"
+}
+
 
 resource "aws_s3_bucket_public_access_block" "vp_test_logs" {
   bucket = aws_s3_bucket.vp_test_logs.id

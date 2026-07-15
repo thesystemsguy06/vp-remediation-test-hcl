@@ -77,6 +77,77 @@ resource "aws_s3_bucket" "vp_test_gd_lists" {
   tags   = var.common_tags_monitoring_gd
 }
 
+resource "aws_s3_bucket_logging" "vp_test_gd_lists_logging" {
+  bucket = aws_s3_bucket.vp_test_gd_lists.id
+
+  target_bucket = aws_s3_bucket.vp_test_gd_lists.id
+  target_prefix = "access-logs/"
+}
+
+
+resource "aws_s3_bucket_lifecycle_configuration" "vp_test_gd_lists_lifecycle" {
+  bucket = aws_s3_bucket.vp_test_gd_lists.id
+
+  rule {
+    id     = "vp-default-lifecycle"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "vp_test_gd_lists_encryption" {
+  bucket = aws_s3_bucket.vp_test_gd_lists.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = { input : kms_key_arn }
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_versioning" "vp_test_gd_lists_versioning" {
+  bucket = aws_s3_bucket.vp_test_gd_lists.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
+resource "aws_s3_bucket_policy" "vp_test_gd_lists_ssl" {
+  bucket = aws_s3_bucket.vp_test_gd_lists.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.vp_test_gd_lists.arn,
+          "${aws_s3_bucket.vp_test_gd_lists.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
 resource "random_id" "gd_suffix" {
   byte_length = 4
 }
