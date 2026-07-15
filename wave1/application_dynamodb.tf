@@ -41,7 +41,7 @@ resource "aws_dynamodb_table" "vp_test" {
   }
 }
 
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "vp_test_caller" {}
 
 # Create IAM role for AWS Backup
 resource "aws_iam_role" "vp_test_backup_role" {
@@ -90,7 +90,7 @@ resource "aws_kms_key" "vp_test_backup_key" {
         Sid    = "Enable IAM User Permissions"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.vp_test_caller.account_id}:root"
         }
         Action   = "kms:*"
         Resource = "*"
