@@ -47,6 +47,39 @@ resource "aws_guardduty_detector" "vp_test" {
   tags = var.common_tags_monitoring_gd
 }
 
+resource "aws_guardduty_detector_feature" "vp_test_eks_audit_logs" {
+  detector_id = aws_guardduty_detector.vp_test.id
+  name        = "EKS_AUDIT_LOGS"
+  status      = "ENABLED"
+}
+
+
+resource "aws_guardduty_detector_feature" "vp_test_ebs_malware_protection" {
+  detector_id = aws_guardduty_detector.vp_test.id
+  name        = "EBS_MALWARE_PROTECTION"
+  status      = "ENABLED"
+}
+
+
+resource "aws_guardduty_detector_feature" "vp_test_lambda_protection" {
+  detector_id = aws_guardduty_detector.vp_test.id
+  name        = "LAMBDA_NETWORK_LOGS"
+  status      = "ENABLED"
+}
+
+
+resource "aws_guardduty_detector_feature" "vp_test_eks_runtime_monitoring" {
+  detector_id = aws_guardduty_detector.vp_test.id
+  name        = "EKS_RUNTIME_MONITORING"
+  status      = "ENABLED"
+
+  additional_configuration {
+    name   = "EKS_ADDON_MANAGEMENT"
+    status = "ENABLED"
+  }
+}
+
+
 resource "aws_guardduty_detector_feature" "vp_test_s3_protection" {
   detector_id = aws_guardduty_detector.vp_test.id
   name        = "S3_DATA_EVENTS"
