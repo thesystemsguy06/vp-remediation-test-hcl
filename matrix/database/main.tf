@@ -127,10 +127,42 @@ resource "aws_elasticache_replication_group" "ec" {
   apply_immediately          = true
 }
 
+# -----------------------------------------------------------------------------
+# RDS instance (aws_db_instance) — Postgres, intentionally violating. Live
+# coverage for the RDS-instance crown-jewel family + validates the RDS.6/RDS.9
+# mapping fix (RDS.6 = enhanced monitoring, RDS.9 = publish logs to CloudWatch):
+#   - no monitoring_interval (0)          -> RDS.6 (enhanced monitoring)
+#   - no enabled_cloudwatch_logs_exports  -> RDS.9 (publish logs)
+#   - deletion_protection = false         -> RDS.8
+#   - backup_retention_period = 0         -> RDS.11
+#   - iam_database_authentication = false -> RDS.10
+#   - auto_minor_version_upgrade = false  -> RDS.13
+# -----------------------------------------------------------------------------
+resource "aws_db_instance" "pg" {
+  identifier                          = "vp-matrix-pg-${random_id.s.hex}"
+  engine                              = "postgres"
+  instance_class                      = "db.t3.micro"
+  allocated_storage                   = 20
+  username                            = "vpadmin"
+  password                            = "${random_password.master.result}Aa1"
+  db_subnet_group_name                = aws_db_subnet_group.aurora.name
+  skip_final_snapshot                 = true
+  storage_encrypted                   = true
+  publicly_accessible                 = false
+  deletion_protection                 = false # violation -> RDS.8
+  backup_retention_period             = 0     # violation -> RDS.11
+  iam_database_authentication_enabled = false # violation -> RDS.10
+  auto_minor_version_upgrade          = false # violation -> RDS.13
+  # no monitoring_interval             -> RDS.6 (enhanced monitoring)
+  # no enabled_cloudwatch_logs_exports -> RDS.9 (publish logs)
+  apply_immediately = true
+}
+
 output "matrix_database" {
   value = {
     aurora      = aws_rds_cluster.aurora.cluster_identifier
     redshift    = aws_redshift_cluster.rs.cluster_identifier
     elasticache = aws_elasticache_replication_group.ec.replication_group_id
+    rds_pg      = aws_db_instance.pg.identifier
   }
 }
