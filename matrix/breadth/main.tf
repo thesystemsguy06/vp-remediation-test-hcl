@@ -49,6 +49,7 @@ resource "aws_ecr_repository" "vp_ecr" {
 # ---- Kinesis: Kinesis.1 (server-side encryption) ----------------------------
 resource "aws_kinesis_stream" "vp_kinesis" {
   encryption_type  = "KMS"
+  kms_key_id       = "alias/aws/kinesis"
   name             = "vp-breadth-kinesis-${local.sfx}"
   shard_count      = 1
   retention_period = 168
