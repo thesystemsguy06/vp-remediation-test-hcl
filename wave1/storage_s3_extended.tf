@@ -119,6 +119,16 @@ resource "aws_s3_bucket_public_access_block" "vp_test_data" {
 resource "aws_s3_bucket" "vp_test_logs" {
   bucket = "vp-e2e-test-logs-${random_id.suffix.hex}"
   tags   = var.common_tags_storage
+
+  object_lock_configuration {
+    object_lock_enabled = "Enabled"
+    rule {
+      default_retention {
+        mode = "GOVERNANCE"
+        days = 1
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "vp_test_logs_ssl" {
