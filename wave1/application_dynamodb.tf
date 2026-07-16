@@ -80,6 +80,7 @@ resource "aws_backup_vault" "vp_test_backup_vault" {
 
 # Create KMS key for backup encryption
 resource "aws_kms_key" "vp_test_backup_key" {
+  enable_key_rotation     = true
   description             = "KMS key for vp_test DynamoDB backup vault"
   deletion_window_in_days = 7
 
