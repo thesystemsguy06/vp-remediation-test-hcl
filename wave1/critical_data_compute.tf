@@ -21,13 +21,16 @@ resource "aws_db_subnet_group" "critical" {
 }
 
 resource "aws_db_instance" "critical" {
-  identifier        = "vp-test-critical-db"
-  engine            = "postgres"
-  engine_version    = "15"
-  instance_class    = "db.t3.micro"
-  username          = "vpadmin"
-  password          = "ChangeMe-E2E-Test-1234!" # test-only; not a real secret
-  allocated_storage = 20
+  monitoring_interval = 60
+  monitoring_role_arn = "arn:aws:iam::746210888062:role/vp-rds-monitoring-role"
+  multi_az            = true
+  identifier          = "vp-test-critical-db"
+  engine              = "postgres"
+  engine_version      = "15"
+  instance_class      = "db.t3.micro"
+  username            = "vpadmin"
+  password            = "ChangeMe-E2E-Test-1234!" # test-only; not a real secret
+  allocated_storage   = 20
 
   db_subnet_group_name   = aws_db_subnet_group.critical.name
   vpc_security_group_ids = [aws_security_group.critical_open.id]
