@@ -53,6 +53,136 @@ resource "aws_db_instance" "critical" {
   tags = { Name = "vp-test-critical-db", ManagedBy = "vectorplane-e2e-test", Wave = "1" }
 }
 
+# IAM role for AWS Backup service
+resource "aws_iam_role" "critical_backup_role" {
+  name = "critical-backup-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "backup.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name    = "critical-backup-role"
+    Purpose = "SecurityHub-RDS-26-Compliance"
+  }
+}
+
+# Attach AWS managed policy for backup service
+resource "aws_iam_role_policy_attachment" "critical_backup_policy" {
+  role       = aws_iam_role.critical_backup_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+}
+
+# Attach AWS managed policy for restores
+resource "aws_iam_role_policy_attachment" "critical_backup_restore_policy" {
+  role       = aws_iam_role.critical_backup_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
+}
+
+# AWS Backup vault
+resource "aws_backup_vault" "critical_backup_vault" {
+  name        = "critical-backup-vault"
+  kms_key_arn = aws_kms_key.critical_backup_key.arn
+
+  tags = {
+    Name    = "critical-backup-vault"
+    Purpose = "SecurityHub-RDS-26-Compliance"
+  }
+}
+
+# KMS key for backup encryption
+resource "aws_kms_key" "critical_backup_key" {
+  description             = "KMS key for critical backup encryption"
+  deletion_window_in_days = 7
+
+  tags = {
+    Name    = "critical-backup-key"
+    Purpose = "SecurityHub-RDS-26-Compliance"
+  }
+}
+
+# KMS key alias
+resource "aws_kms_alias" "critical_backup_key_alias" {
+  name          = "alias/critical-backup-key"
+  target_key_id = aws_kms_key.critical_backup_key.key_id
+}
+
+# AWS Backup plan
+resource "aws_backup_plan" "critical_backup_plan" {
+  name = "critical-backup-plan"
+
+  rule {
+    rule_name         = "critical-daily-backup-rule"
+    target_vault_name = aws_backup_vault.critical_backup_vault.name
+    schedule          = "cron(0 5 ? * * *)"
+    start_window      = 480
+    completion_window = 10080
+
+    recovery_point_tags = {
+      Name    = "critical-backup"
+      Purpose = "SecurityHub-RDS-26-Compliance"
+    }
+
+    lifecycle {
+      cold_storage_after = 30
+      delete_after       = 120
+    }
+
+    copy_action {
+      destination_vault_arn = aws_backup_vault.critical_backup_vault.arn
+      lifecycle {
+        cold_storage_after = 30
+        delete_after       = 120
+      }
+    }
+  }
+
+  advanced_backup_setting {
+    backup_options = {
+      WindowsVSS = "enabled"
+    }
+    resource_type = "EC2"
+  }
+
+  tags = {
+    Name    = "critical-backup-plan"
+    Purpose = "SecurityHub-RDS-26-Compliance"
+  }
+}
+
+# AWS Backup selection
+resource "aws_backup_selection" "critical_backup_selection" {
+  iam_role_arn = aws_iam_role.critical_backup_role.arn
+  name         = "critical-backup-selection"
+  plan_id      = aws_backup_plan.critical_backup_plan.id
+
+  resources = [
+    aws_db_instance.critical.arn
+  ]
+
+  selection_tag {
+    type  = "STRINGEQUALS"
+    key   = "BackupEnabled"
+    value = "true"
+  }
+
+  condition {
+    string_equals {
+      key   = "aws:ResourceTag/Environment"
+      value = "production"
+    }
+  }
+}
+
+
 # ─── EBS volume ──────────────────────────────────────────────────────────────
 # EC2.3 — EBS volumes should be encrypted at rest (replacement-required advisory)
 resource "aws_ebs_volume" "critical" {
