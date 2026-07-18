@@ -18,7 +18,8 @@ variable "common_tags_messaging" {
 
 # SNS topic — no KMS, no tags — triggers SNS.1, SNS.3
 resource "aws_sns_topic" "vp_test" {
-  name = "vp-test-insecure-topic"
+  kms_master_key_id = "alias/aws/sns"
+  name              = "vp-test-insecure-topic"
   # No kms_master_key_id — triggers SNS.1
   # No tags — triggers SNS.3
 }
