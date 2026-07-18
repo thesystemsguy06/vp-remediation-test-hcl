@@ -87,6 +87,7 @@ resource "aws_s3_bucket_policy" "vp_test_cloudtrail" {
 
 # CloudTrail — single-region, no KMS, no log validation, no CloudWatch
 resource "aws_cloudtrail" "vp_test" {
+  kms_key_id                 = "arn:aws:kms:us-east-1:746210888062:key/471939a9-740e-4283-9f7d-4ba9ef9da5be"
   name                       = "vp-test-insecure-trail"
   s3_bucket_name             = aws_s3_bucket.vp_test_cloudtrail.id
   is_multi_region_trail      = false
