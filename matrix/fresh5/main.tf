@@ -16,10 +16,11 @@ resource "aws_security_group" "vp_elb" {
 }
 
 resource "aws_elb" "vp_classic" {
-  name            = "vp-fresh5-elb-${random_id.s.hex}"
-  internal        = false
-  subnets         = ["subnet-0dd7628650cbd31c3", "subnet-0cbeafce2becbdcae"]
-  security_groups = [aws_security_group.vp_elb.id]
+  connection_draining = true
+  name                = "vp-fresh5-elb-${random_id.s.hex}"
+  internal            = false
+  subnets             = ["subnet-0dd7628650cbd31c3", "subnet-0cbeafce2becbdcae"]
+  security_groups     = [aws_security_group.vp_elb.id]
 
   # HTTP-only listener: no HTTPS, no SSL cert, no SSL policy.
   listener {
