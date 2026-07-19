@@ -24,7 +24,7 @@ resource "aws_launch_template" "vp" {
 
   # EC2.181: root EBS volume unencrypted
   block_device_mappings {
-    device_name = "/dev/sda1"
+    device_name = "/dev/xvda"
     ebs {
       encrypted   = false
       volume_size = 8
