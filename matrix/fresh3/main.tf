@@ -4,6 +4,11 @@
 # ECS.12 — cluster without Container Insights enabled
 resource "aws_ecs_cluster" "vp_ecs_cluster" {
   name = "vp-fresh3-ecs-${random_id.s.hex}"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 # SNS — topic without encryption / hardening (catches net-new SNS controls)
