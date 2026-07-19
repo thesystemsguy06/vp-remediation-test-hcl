@@ -5,7 +5,7 @@
 resource "aws_ecs_task_definition" "vp_ecs" {
   family       = "vp-fresh2-ecs-${random_id.s.hex}"
   network_mode = "bridge"
-  pid_mode     = "host"
+  pid_mode     = "task"
   container_definitions = jsonencode([{
     name      = "app"
     image     = "public.ecr.aws/nginx/nginx:latest"
