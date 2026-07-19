@@ -32,6 +32,16 @@ resource "aws_cloudfront_distribution" "vp_cf" {
     }
   }
 
+  # Second origin so CloudFront.4 origin-failover can reference a real failover member.
+  origin {
+    domain_name = aws_s3_bucket.origin.bucket_regional_domain_name
+    origin_id   = "s3-failover"
+
+    s3_origin_config {
+      origin_access_identity = ""
+    }
+  }
+
   # Insecure default behavior: HTTP allowed (viewer_protocol_policy = allow-all).
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD"]
@@ -59,6 +69,28 @@ resource "aws_cloudfront_distribution" "vp_cf" {
     ssl_support_method             = "sni-only"
   }
 
+
+  logging_config {
+    bucket          = "vp-cf-logs-a97ab2f7.s3.amazonaws.com"
+    prefix          = "cloudfront-logs/"
+    include_cookies = false
+  }
+
+  origin_group {
+    origin_id = "vp-origin-group"
+
+    failover_criteria {
+      status_codes = [403, 404, 500, 502, 503, 504]
+    }
+
+    member {
+      origin_id = "s3-origin"
+    }
+
+    member {
+      origin_id = "s3-failover"
+    }
+  }
 }
 
 resource "aws_cloudfront_origin_access_control" "main_oac" {
