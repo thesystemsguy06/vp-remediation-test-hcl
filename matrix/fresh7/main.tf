@@ -59,12 +59,6 @@ resource "aws_cloudfront_distribution" "vp_cf" {
     ssl_support_method             = "sni-only"
   }
 
-  logging_config {
-    bucket          = "my-cloudfront-logs-bucket.s3.amazonaws.com"
-    prefix          = "cloudfront-logs/"
-    include_cookies = false
-  }
-
 }
 
 resource "aws_cloudfront_origin_access_control" "main_oac" {
