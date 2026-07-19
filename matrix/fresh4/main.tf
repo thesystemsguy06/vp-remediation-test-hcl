@@ -9,9 +9,10 @@ resource "aws_security_group" "vp_alb" {
 # ELB.4 (drop_invalid_header_fields absent=false) + ELB.6 (deletion protection off)
 # + ELB.13 (multi-AZ: 2 subnets provided)
 resource "aws_lb" "vp_alb" {
-  name               = "vp-fresh4-alb-${random_id.s.hex}"
-  internal           = true
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.vp_alb.id]
-  subnets            = ["subnet-0dd7628650cbd31c3", "subnet-0cbeafce2becbdcae"]
+  enable_deletion_protection = true
+  name                       = "vp-fresh4-alb-${random_id.s.hex}"
+  internal                   = true
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.vp_alb.id]
+  subnets                    = ["subnet-0dd7628650cbd31c3", "subnet-0cbeafce2becbdcae"]
 }
