@@ -65,21 +65,6 @@ resource "aws_cloudfront_distribution" "vp_cf" {
     include_cookies = false
   }
 
-  origin_group {
-    origin_id = "groupS3-example"
-
-    failover_criteria {
-      status_codes = [403, 404, 500, 502, 503, 504]
-    }
-
-    member {
-      origin_id = "primaryS3"
-    }
-
-    member {
-      origin_id = "failoverS3"
-    }
-  }
 }
 
 resource "aws_cloudfront_origin_access_control" "main_oac" {
