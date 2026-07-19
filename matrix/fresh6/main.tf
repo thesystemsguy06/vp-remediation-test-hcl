@@ -78,6 +78,6 @@ resource "aws_ecs_service" "vp_fresh6" {
 
   network_configuration {
     subnets          = ["subnet-0dd7628650cbd31c3", "subnet-0cbeafce2becbdcae"]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 }
