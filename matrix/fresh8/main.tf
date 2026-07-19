@@ -57,12 +57,12 @@ resource "aws_api_gateway_stage" "vp" {
 # Method settings: caching ENABLED so APIGateway.5 evaluates, but cache_data_encrypted
 # is OMITTED (defaults false) → cache not encrypted at rest.
 resource "aws_api_gateway_method_settings" "vp" {
-  cache_data_encrypted = true
-  rest_api_id          = aws_api_gateway_rest_api.vp.id
-  stage_name           = aws_api_gateway_stage.vp.stage_name
-  method_path          = "*/*"
+  rest_api_id = aws_api_gateway_rest_api.vp.id
+  stage_name  = aws_api_gateway_stage.vp.stage_name
+  method_path = "*/*"
   settings {
-    caching_enabled = true
-    metrics_enabled = true
+    caching_enabled      = true
+    metrics_enabled      = true
+    cache_data_encrypted = true
   }
 }
