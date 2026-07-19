@@ -31,6 +31,18 @@ resource "aws_s3_bucket" "bare" {
   }
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "bare_encryption" {
+  bucket = aws_s3_bucket.bare.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = "arn:aws:kms:us-east-1:746210888062:key/16c15ba7-402c-43d0-ba11-329276ef2ece"
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+
 data "aws_caller_identity" "current" {}
 
 # S3 Event Notifications remediation for SecurityHub S3.11
