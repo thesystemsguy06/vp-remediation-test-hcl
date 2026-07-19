@@ -18,8 +18,9 @@ resource "aws_s3_bucket" "origin" {
 }
 
 resource "aws_cloudfront_distribution" "vp_cf" {
-  enabled = true
-  comment = "vp-fresh7 intentionally-insecure distribution"
+  default_root_object = "index.html"
+  enabled             = true
+  comment             = "vp-fresh7 intentionally-insecure distribution"
 
   # Private S3 origin with NO origin access control and empty OAI => public/legacy.
   origin {
@@ -36,7 +37,7 @@ resource "aws_cloudfront_distribution" "vp_cf" {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "s3-origin"
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
 
     forwarded_values {
       query_string = false
@@ -55,5 +56,37 @@ resource "aws_cloudfront_distribution" "vp_cf" {
   # Default CloudFront cert => weak minimum TLS (TLSv1); no ACM/custom cert.
   viewer_certificate {
     cloudfront_default_certificate = true
+    ssl_support_method             = "sni-only"
+  }
+
+  logging_config {
+    bucket          = "my-cloudfront-logs-bucket.s3.amazonaws.com"
+    prefix          = "cloudfront-logs/"
+    include_cookies = false
+  }
+
+  origin_group {
+    origin_id = "groupS3-example"
+
+    failover_criteria {
+      status_codes = [403, 404, 500, 502, 503, 504]
+    }
+
+    member {
+      origin_id = "primaryS3"
+    }
+
+    member {
+      origin_id = "failoverS3"
+    }
   }
 }
+
+resource "aws_cloudfront_origin_access_control" "main_oac" {
+  name                              = "cloudfront-oac"
+  description                       = "OAC for CloudFront distribution"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
