@@ -48,10 +48,10 @@ resource "aws_api_gateway_deployment" "vp" {
 # Violating stage: no access_log_settings (APIGateway.1), X-Ray off (APIGateway.3),
 # no WAF association (APIGateway.4).
 resource "aws_api_gateway_stage" "vp" {
-  rest_api_id           = aws_api_gateway_rest_api.vp.id
-  deployment_id         = aws_api_gateway_deployment.vp.id
-  stage_name            = "prod"
-  xray_tracing_enabled  = false
+  rest_api_id          = aws_api_gateway_rest_api.vp.id
+  deployment_id        = aws_api_gateway_deployment.vp.id
+  stage_name           = "prod"
+  xray_tracing_enabled = true
 }
 
 # Method settings: caching ENABLED so APIGateway.5 evaluates, but cache_data_encrypted
@@ -61,7 +61,8 @@ resource "aws_api_gateway_method_settings" "vp" {
   stage_name  = aws_api_gateway_stage.vp.stage_name
   method_path = "*/*"
   settings {
-    caching_enabled = true
-    metrics_enabled = true
+    caching_enabled      = true
+    metrics_enabled      = true
+    cache_data_encrypted = true
   }
 }
