@@ -13,12 +13,12 @@ resource "aws_launch_template" "vp" {
 
   # EC2.170: IMDSv2 not enforced
   metadata_options {
-    http_tokens = "optional"
+    http_tokens = "required"
   }
 
   # EC2.25: interface auto-assigns a public IP
   network_interfaces {
-    associate_public_ip_address = true
+    associate_public_ip_address = false
     device_index                = 0
   }
 
