@@ -9,23 +9,37 @@ resource "aws_sqs_queue" "vp_sqs" {
 
 # Kinesis.1 (no server-side encryption) + Kinesis.3 (retention < 168h; default 24)
 resource "aws_kinesis_stream" "vp_kinesis" {
-  name        = "vp-fresh1-kinesis-${random_id.s.hex}"
-  shard_count = 1
+  retention_period = 168
+  encryption_type  = "KMS"
+  kms_key_id       = "alias/aws/kinesis"
+  name             = "vp-fresh1-kinesis-${random_id.s.hex}"
+  shard_count      = 1
 }
 
 # ECR.1 (no scan-on-push) + ECR.2 (tag mutability = MUTABLE by default)
 resource "aws_ecr_repository" "vp_ecr" {
-  name = "vp-fresh1-ecr-${random_id.s.hex}"
+  image_tag_mutability = "IMMUTABLE"
+  name                 = "vp-fresh1-ecr-${random_id.s.hex}"
+
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key         = "arn:aws:kms:us-east-1:746210888062:key/16c15ba7-402c-43d0-ba11-329276ef2ece"
+  }
 }
 
 # DynamoDB.2 (no server_side_encryption block) + DynamoDB.6 (deletion protection off)
 resource "aws_dynamodb_table" "vp_dynamodb" {
-  name         = "vp-fresh1-ddb-${random_id.s.hex}"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
+  deletion_protection_enabled = true
+  name                        = "vp-fresh1-ddb-${random_id.s.hex}"
+  billing_mode                = "PAY_PER_REQUEST"
+  hash_key                    = "id"
   attribute {
     name = "id"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 }
 
