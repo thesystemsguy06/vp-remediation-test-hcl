@@ -50,7 +50,8 @@ resource "aws_cloudwatch_log_group" "vp_cwlg" {
 
 # KMS.4 — customer key with rotation disabled (default)
 resource "aws_kms_key" "vp_kms" {
-  description = "vp-fresh1-kms-${random_id.s.hex}"
+  enable_key_rotation = true
+  description         = "vp-fresh1-kms-${random_id.s.hex}"
 }
 
 # Athena.4 — workgroup without enforced configuration
