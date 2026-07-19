@@ -17,7 +17,7 @@ resource "aws_ecs_task_definition" "vp_ecs" {
 # EFS.1 — unencrypted file system (encryption is create-time; fix forces replace of an empty FS)
 resource "aws_efs_file_system" "vp_efs" {
   creation_token = "vp-fresh2-efs-${random_id.s.hex}"
-  encrypted      = false
+  encrypted      = true
 }
 
 # SSM.7 — SSM document without KMS block sharing / encryption (sh_ssm_7 SUB_RESOURCE)
@@ -37,17 +37,25 @@ resource "aws_ssm_document" "vp_ssm" {
 
 # DynamoDB.1 — table not encrypted with a customer KMS key (KMS-input fix)
 resource "aws_dynamodb_table" "vp_ddb_kms" {
-  name         = "vp-fresh2-ddbkms-${random_id.s.hex}"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
+  deletion_protection_enabled = true
+  name                        = "vp-fresh2-ddbkms-${random_id.s.hex}"
+  billing_mode                = "PAY_PER_REQUEST"
+  hash_key                    = "id"
   attribute {
     name = "id"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 }
 
 # Kinesis.2 — stream not encrypted with a customer KMS key (KMS-input fix)
 resource "aws_kinesis_stream" "vp_kinesis_kms" {
-  name        = "vp-fresh2-kinkms-${random_id.s.hex}"
-  shard_count = 1
+  retention_period = 168
+  encryption_type  = "KMS"
+  kms_key_id       = "alias/aws/kinesis"
+  name             = "vp-fresh2-kinkms-${random_id.s.hex}"
+  shard_count      = 1
 }
