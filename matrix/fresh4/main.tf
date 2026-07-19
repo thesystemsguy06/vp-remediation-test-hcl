@@ -9,6 +9,7 @@ resource "aws_security_group" "vp_alb" {
 # ELB.4 (drop_invalid_header_fields absent=false) + ELB.6 (deletion protection off)
 # + ELB.13 (multi-AZ: 2 subnets provided)
 resource "aws_lb" "vp_alb" {
+  drop_invalid_header_fields = true
   enable_deletion_protection = true
   name                       = "vp-fresh4-alb-${random_id.s.hex}"
   internal                   = true
