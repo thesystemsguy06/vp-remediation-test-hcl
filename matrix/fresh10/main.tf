@@ -10,7 +10,7 @@
 resource "aws_ecs_task_definition" "vp" {
   family                   = "vp-fresh10-${random_id.s.hex}"
   network_mode             = "bridge"
-  pid_mode                 = "host"
+  pid_mode                 = "task"
   requires_compatibilities = ["EC2"]
   cpu                      = "256"
   memory                   = "512"
