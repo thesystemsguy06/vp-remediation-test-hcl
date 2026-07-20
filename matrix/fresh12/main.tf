@@ -9,18 +9,32 @@
 # default (false); RDS.5 may fire but its fix is cost-doubling so it's a campaign-time choice.
 
 resource "aws_db_instance" "vp" {
-  identifier                 = "vp-fresh12-${random_id.s.hex}"
-  engine                     = "mysql"
-  engine_version             = "8.0"
-  instance_class             = "db.t3.micro"
-  allocated_storage          = 20
-  username                   = "vpadmin"
-  password                   = "ChangeMe123456"
-  storage_encrypted          = false
-  publicly_accessible        = true
-  copy_tags_to_snapshot      = false
-  auto_minor_version_upgrade = false
-  skip_final_snapshot        = true
-  deletion_protection        = false
-  apply_immediately          = true
+  iam_database_authentication_enabled = true
+  backup_retention_period             = 7
+  identifier                          = "vp-fresh12-${random_id.s.hex}"
+  engine                              = "mysql"
+  engine_version                      = "8.0"
+  instance_class                      = "db.t3.micro"
+  allocated_storage                   = 20
+  username                            = "vpadmin"
+  password                            = "ChangeMe123456"
+  storage_encrypted                   = false
+  publicly_accessible                 = false
+  copy_tags_to_snapshot               = true
+  auto_minor_version_upgrade          = true
+  skip_final_snapshot                 = true
+  deletion_protection                 = true
+  apply_immediately                   = true
+  parameter_group_name                = aws_db_parameter_group.vp_force_ssl.name
 }
+
+resource "aws_db_parameter_group" "vp_force_ssl" {
+  family = "mysql8.0"
+  name   = "vp-force-ssl"
+
+  parameter {
+    name  = "require_secure_transport"
+    value = "ON"
+  }
+}
+
