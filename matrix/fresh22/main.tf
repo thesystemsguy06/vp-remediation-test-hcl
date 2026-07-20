@@ -3,12 +3,17 @@
 #   ECR.1      — repo with image scanning off
 #   Kinesis.2  — stream without KMS encryption
 resource "aws_dynamodb_table" "vp" {
-  name         = "vp-fresh22-${random_id.s.hex}"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
+  deletion_protection_enabled = true
+  name                        = "vp-fresh22-${random_id.s.hex}"
+  billing_mode                = "PAY_PER_REQUEST"
+  hash_key                    = "id"
   attribute {
     name = "id"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 }
 resource "aws_ecr_repository" "vp" {
