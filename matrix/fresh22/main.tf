@@ -29,6 +29,9 @@ resource "aws_ecr_repository" "vp" {
   }
 }
 resource "aws_kinesis_stream" "vp" {
-  name        = "vp-fresh22-${random_id.s.hex}"
-  shard_count = 1
+  encryption_type  = "KMS"
+  kms_key_id       = "alias/aws/kinesis"
+  retention_period = 168
+  name             = "vp-fresh22-${random_id.s.hex}"
+  shard_count      = 1
 }
