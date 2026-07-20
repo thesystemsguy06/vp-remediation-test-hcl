@@ -53,6 +53,11 @@ resource "aws_lambda_function" "vp_fresh6" {
 # ---------------------------------------------------------------------------
 resource "aws_ecs_cluster" "vp_fresh6" {
   name = "vp-fresh6-cluster-${random_id.s.hex}"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 resource "aws_ecs_task_definition" "vp_fresh6" {
