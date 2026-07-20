@@ -15,7 +15,7 @@ resource "aws_instance" "vp" {
   instance_type = "t3.micro"
 
   metadata_options {
-    http_tokens = "optional" # EC2.8: IMDSv2 not enforced
+    http_tokens = "required" # EC2.8: IMDSv2 not enforced
   }
 
   tags = { Name = "vp-fresh15-${random_id.s.hex}" }
