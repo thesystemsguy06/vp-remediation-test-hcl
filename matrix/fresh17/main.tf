@@ -7,4 +7,13 @@ resource "aws_efs_file_system" "vp" {
 resource "aws_efs_access_point" "vp" {
   file_system_id = aws_efs_file_system.vp.id
   # violating: no root_directory (EFS.3), no posix_user (EFS.4)
+
+  root_directory {
+    path = "/secure"
+  }
+
+  posix_user {
+    uid = 1001
+    gid = 1001
+  }
 }
