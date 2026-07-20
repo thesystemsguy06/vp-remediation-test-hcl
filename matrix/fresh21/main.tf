@@ -15,7 +15,7 @@ resource "aws_dms_replication_subnet_group" "vp" {
 }
 resource "aws_dms_replication_instance" "vp" {
   replication_instance_id     = "vp-fresh21-${random_id.s.hex}"
-  replication_instance_class  = "dms.t3.micro"
+  replication_instance_class  = "dms.t2.micro"
   allocated_storage           = 5
   publicly_accessible         = true  # DMS.1 (violating)
   auto_minor_version_upgrade  = false # DMS.6 (violating)
