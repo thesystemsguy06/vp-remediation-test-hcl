@@ -18,5 +18,5 @@ resource "aws_sagemaker_notebook_instance" "vp" {
   instance_type          = "ml.t3.medium"
   direct_internet_access = "Enabled" # SageMaker.1 (violating)
   root_access            = "Enabled" # SageMaker.3 (violating)
-  platform_identifier    = "notebook-al1-v1" # SageMaker.8 (violating: old platform)
+  platform_identifier    = "notebook-al2-v2" # SageMaker.8 (violating: old platform)
 }
