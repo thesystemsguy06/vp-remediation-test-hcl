@@ -46,6 +46,11 @@ resource "aws_lambda_function" "vp_fresh6" {
   runtime          = "python3.12"
   filename         = data.archive_file.vp_lambda_zip.output_path
   source_code_hash = data.archive_file.vp_lambda_zip.output_base64sha256
+
+  vpc_config {
+    subnet_ids         = ["subnet-0dd7628650cbd31c3"]
+    security_group_ids = ["sg-055114eda16cd94b1"]
+  }
 }
 
 # ---------------------------------------------------------------------------
