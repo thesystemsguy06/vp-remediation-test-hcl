@@ -6,6 +6,6 @@ resource "aws_ses_configuration_set" "sa1_insecure" {
   reputation_metrics_enabled = false
 
   delivery_options {
-    tls_policy = "Optional"
+    tls_policy = "Require"
   }
 }
