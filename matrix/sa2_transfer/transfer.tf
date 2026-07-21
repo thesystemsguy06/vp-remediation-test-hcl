@@ -15,8 +15,9 @@ resource "aws_secretsmanager_secret_version" "sftp" {
 }
 
 resource "aws_transfer_connector" "vp" {
-  access_role = "arn:aws:iam::746210888062:role/vp-companion-856b2431"
-  url         = "sftp://sftp.vp-sa2-${random_id.s.hex}.example.com"
+  logging_role = "arn:aws:iam::746210888062:role/vp-companion-856b2431"
+  access_role  = "arn:aws:iam::746210888062:role/vp-companion-856b2431"
+  url          = "sftp://sftp.vp-sa2-${random_id.s.hex}.example.com"
 
   sftp_config {
     user_secret_id    = aws_secretsmanager_secret.sftp.arn
