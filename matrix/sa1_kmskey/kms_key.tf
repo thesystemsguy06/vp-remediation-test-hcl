@@ -2,6 +2,7 @@
 # (KMS.3 = key should not be scheduled for deletion; the key is scheduled for
 #  deletion out-of-band after apply so it enters PendingDeletion state.)
 resource "aws_kms_key" "sa1_norotate" {
+  is_enabled              = true
   description             = "VP e2e violating fixture ${random_id.s.hex}: rotation disabled"
   enable_key_rotation     = false
   deletion_window_in_days = 7
