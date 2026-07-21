@@ -39,8 +39,9 @@ resource "aws_s3_bucket_policy" "trail" {
 }
 
 resource "aws_cloudtrail" "vp" {
-  name           = "vp-sa2-${random_id.s.hex}"
-  s3_bucket_name = aws_s3_bucket.trail.id
-  enable_logging = true
-  depends_on     = [aws_s3_bucket_policy.trail]
+  enable_log_file_validation = true
+  name                       = "vp-sa2-${random_id.s.hex}"
+  s3_bucket_name             = aws_s3_bucket.trail.id
+  enable_logging             = true
+  depends_on                 = [aws_s3_bucket_policy.trail]
 }
