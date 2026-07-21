@@ -8,7 +8,7 @@ resource "aws_subnet" "vp" {
   vpc_id                  = "vpc-0880cc850def460a5"
   cidr_block              = "172.31.200.0/24"
   availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   tags = {
     Name = "vp-sa3-subnet-${random_id.s.hex}"
   }
