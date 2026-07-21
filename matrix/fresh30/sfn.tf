@@ -4,4 +4,10 @@ resource "aws_sfn_state_machine" "vp" {
   definition = jsonencode({
     Comment = "vp", StartAt = "Done", States = { Done = { Type = "Succeed" } }
   })
+
+  logging_configuration {
+    log_destination        = "arn:aws:logs:us-east-1:746210888062:log-group:/vp/companion/856b2431"
+    include_execution_data = true
+    level                  = "ALL"
+  }
 }
