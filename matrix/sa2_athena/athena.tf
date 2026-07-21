@@ -17,7 +17,7 @@ resource "aws_athena_workgroup" "vp" {
 
   configuration {
     enforce_workgroup_configuration    = false
-    publish_cloudwatch_metrics_enabled = false
+    publish_cloudwatch_metrics_enabled = true
 
     result_configuration {
       output_location = "s3://${aws_s3_bucket.results.id}/output/"
