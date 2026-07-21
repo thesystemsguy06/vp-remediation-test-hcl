@@ -11,8 +11,9 @@ resource "aws_s3_bucket" "results" {
 }
 
 resource "aws_athena_workgroup" "vp" {
-  name          = "vp-sa2-${random_id.s.hex}"
-  force_destroy = true
+  publish_cloudwatch_metrics_enabled = true
+  name                               = "vp-sa2-${random_id.s.hex}"
+  force_destroy                      = true
 
   configuration {
     enforce_workgroup_configuration    = false
