@@ -5,10 +5,15 @@
 # groups, so protocol must be "TCP". connection_termination is omitted → defaults
 # to false, which is the violating state.
 resource "aws_lb_target_group" "vp" {
-  name        = "vp-sb1-${random_id.s.hex}"
-  port        = 80
-  protocol    = "TCP"
-  target_type = "instance"
-  vpc_id      = "vpc-0880cc850def460a5"
+  connection_termination = true
+  name                   = "vp-sb1-${random_id.s.hex}"
+  port                   = 80
+  protocol               = "TCP"
+  target_type            = "instance"
+  vpc_id                 = "vpc-0880cc850def460a5"
   # connection_termination omitted (defaults false) → ELB.22 violation
+
+  health_check {
+    protocol = "HTTPS"
+  }
 }
