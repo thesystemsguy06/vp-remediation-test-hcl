@@ -5,5 +5,5 @@
 # the composer's fix adds a log_config and/or a stronger authentication provider.
 resource "aws_appsync_graphql_api" "vp" {
   name                = "vp-sb2-appsync-${random_id.s.hex}"
-  authentication_type = "API_KEY"
+  authentication_type = "AWS_IAM"
 }
