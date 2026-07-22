@@ -39,6 +39,8 @@ resource "aws_s3_bucket_policy" "trail" {
 }
 
 resource "aws_cloudtrail" "vp" {
+  cloud_watch_logs_group_arn = "arn:aws:logs:us-east-1:746210888062:log-group:/vp/companion/856b2431"
+  kms_key_id                 = "arn:aws:kms:us-east-1:746210888062:key/8e81be12-deed-4aa9-ad53-51223ba4a09e"
   enable_log_file_validation = true
   name                       = "vp-sa2-${random_id.s.hex}"
   s3_bucket_name             = aws_s3_bucket.trail.id
