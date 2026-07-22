@@ -27,4 +27,15 @@ resource "aws_opensearch_domain" "violating" {
   #  - log_publishing_options     -> Opensearch.4 / Opensearch.5 (error + audit logging)
   #  - advanced_security_options  -> Opensearch.7 (fine-grained access control)
   #  - single node (count=1)      -> Opensearch.6 (zone awareness / >=3 data nodes)
+
+  vpc_options {
+    security_group_ids = ["sg-055114eda16cd94b1"]
+    subnet_ids         = ["subnet-0dd7628650cbd31c3"]
+  }
+
+  log_publishing_options {
+    log_type                 = "AUDIT_LOGS"
+    cloudwatch_log_group_arn = "arn:aws:logs:us-east-1:746210888062:log-group:/vp/companion/856b2431"
+    enabled                  = true
+  }
 }
