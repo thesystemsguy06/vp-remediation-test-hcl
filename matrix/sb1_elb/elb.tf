@@ -28,8 +28,8 @@ resource "aws_elb" "vp" {
   }
 
   # Violating settings:
-  cross_zone_load_balancing = false
-  connection_draining       = false
-  desync_mitigation_mode    = "monitor"
+  cross_zone_load_balancing = true
+  connection_draining       = true
+  desync_mitigation_mode    = "defensive"
   # access_logs block omitted → access logging disabled
 }
