@@ -52,6 +52,11 @@ resource "aws_api_gateway_stage" "vp" {
   deployment_id        = aws_api_gateway_deployment.vp.id
   stage_name           = "prod"
   xray_tracing_enabled = true
+
+  access_log_settings {
+    destination_arn = "arn:aws:logs:us-east-1:746210888062:log-group:/vp/companion/856b2431"
+    format          = "$context.requestId $context.status $context.error.message $context.error.messageString"
+  }
 }
 
 # Method settings: caching ENABLED so APIGateway.5 evaluates, but cache_data_encrypted
