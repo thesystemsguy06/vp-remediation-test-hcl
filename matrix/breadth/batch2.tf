@@ -62,7 +62,7 @@ resource "aws_ecs_cluster" "vp_ecs" {
 
   setting {
     name  = "containerInsights"
-    value = "disabled" # ECS.12 violation
+    value = "enabled" # ECS.12 violation
   }
 }
 
