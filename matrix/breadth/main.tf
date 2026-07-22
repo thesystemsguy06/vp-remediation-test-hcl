@@ -45,6 +45,11 @@ resource "aws_ecr_repository" "vp_ecr" {
     scan_on_push = false # ECR.1 violation
   }
   # no aws_ecr_lifecycle_policy companion -> ECR.3 violation
+
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key         = "arn:aws:kms:us-east-1:746210888062:key/8e81be12-deed-4aa9-ad53-51223ba4a09e"
+  }
 }
 
 # ---- Kinesis: Kinesis.1 (server-side encryption) ----------------------------
