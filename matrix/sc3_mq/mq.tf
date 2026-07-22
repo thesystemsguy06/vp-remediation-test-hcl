@@ -20,4 +20,9 @@ resource "aws_mq_broker" "vp" {
     username = "vpadmin"
     password = "VpTestBrokerPass123"
   }
+
+  logs {
+    audit   = true
+    general = true
+  }
 }
