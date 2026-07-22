@@ -4,7 +4,8 @@
 
 # ---- CloudFront: CloudFront.1/3/5/6/9 + TLS controls (highest yield) --------
 resource "aws_cloudfront_distribution" "vp_cf" {
-  enabled = true
+  http_version = "http2"
+  enabled      = true
   # no default_root_object          -> CloudFront.1
   # no logging_config               -> CloudFront.5
   # no web_acl_id                   -> CloudFront.6
@@ -26,7 +27,7 @@ resource "aws_cloudfront_distribution" "vp_cf" {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "vp-origin"
-    viewer_protocol_policy = "allow-all" # CloudFront.3 violation (no HTTPS enforce)
+    viewer_protocol_policy = "redirect-to-https" # CloudFront.3 violation (no HTTPS enforce)
 
     forwarded_values {
       query_string = false
@@ -44,9 +45,16 @@ resource "aws_cloudfront_distribution" "vp_cf" {
 
   viewer_certificate {
     cloudfront_default_certificate = true # default cert (no custom TLS)
+    ssl_support_method             = "sni-only"
   }
 
   price_class = "PriceClass_100"
+
+  logging_config {
+    bucket          = "vp-companion-logs-856b2431.s3.amazonaws.com"
+    prefix          = "cloudfront-logs/"
+    include_cookies = false
+  }
 }
 
 # ---- EBS volume: EC2.3 (encryption at rest) ---------------------------------
