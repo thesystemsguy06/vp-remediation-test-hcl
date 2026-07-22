@@ -26,4 +26,13 @@ resource "aws_lambda_function" "this" {
   runtime          = "python3.12"
   filename         = data.archive_file.fn.output_path
   source_code_hash = data.archive_file.fn.output_base64sha256
+
+  dead_letter_config {
+    target_arn = "arn:aws:sns:us-east-1:746210888062:vp-companion-856b2431"
+  }
+
+  vpc_config {
+    subnet_ids         = ["subnet-0dd7628650cbd31c3"]
+    security_group_ids = ["sg-055114eda16cd94b1"]
+  }
 }
