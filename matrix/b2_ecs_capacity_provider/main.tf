@@ -25,7 +25,7 @@ resource "aws_ecs_capacity_provider" "insecure" {
   name = "vp-insecure-ecs-cp-b2"
   auto_scaling_group_provider {
     auto_scaling_group_arn         = aws_autoscaling_group.insecure.arn
-    managed_termination_protection = "DISABLED"
+    managed_termination_protection = "ENABLED"
     managed_scaling {
       status = "DISABLED"
     }
