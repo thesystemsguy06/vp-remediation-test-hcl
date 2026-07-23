@@ -1,9 +1,11 @@
 resource "aws_lb" "vp_b3" {
-  name               = "vp-b3-alb"
-  internal           = true
-  load_balancer_type = "application"
-  security_groups    = ["sg-055114eda16cd94b1"]
-  subnets            = ["subnet-0dd7628650cbd31c3", "subnet-0a0a41f888339dd65"]
+  drop_invalid_header_fields = true
+  enable_deletion_protection = true
+  name                       = "vp-b3-alb"
+  internal                   = true
+  load_balancer_type         = "application"
+  security_groups            = ["sg-055114eda16cd94b1"]
+  subnets                    = ["subnet-0dd7628650cbd31c3", "subnet-0a0a41f888339dd65"]
 }
 resource "aws_lb_target_group" "vp_b3" {
   name        = "vp-b3-tg"
