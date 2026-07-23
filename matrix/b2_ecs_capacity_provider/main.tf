@@ -10,11 +10,12 @@ resource "aws_launch_template" "insecure" {
 }
 
 resource "aws_autoscaling_group" "insecure" {
-  name                = "vp-insecure-ecs-cp-asg-b2"
-  min_size            = 0
-  max_size            = 0
-  desired_capacity    = 0
-  vpc_zone_identifier = ["subnet-0dd7628650cbd31c3", "subnet-0a0a41f888339dd65"]
+  name                    = "vp-insecure-ecs-cp-asg-b2"
+  min_size                = 0
+  max_size                = 0
+  desired_capacity        = 0
+  protect_from_scale_in   = true
+  vpc_zone_identifier     = ["subnet-0dd7628650cbd31c3", "subnet-0a0a41f888339dd65"]
   launch_template {
     id      = aws_launch_template.insecure.id
     version = "$Latest"
@@ -24,10 +25,13 @@ resource "aws_autoscaling_group" "insecure" {
 resource "aws_ecs_capacity_provider" "insecure" {
   name = "vp-insecure-ecs-cp-b2"
   auto_scaling_group_provider {
-    auto_scaling_group_arn         = aws_autoscaling_group.insecure.arn
-    managed_termination_protection = "ENABLED"
+    auto_scaling_group_arn = aws_autoscaling_group.insecure.arn
+    # Realistic ECS.19 violation: managed scaling is ON (the common setup) but
+    # managed termination protection is OFF. The fix only needs to flip protection ON.
+    managed_termination_protection = "DISABLED"
     managed_scaling {
-      status = "DISABLED"
+      status         = "ENABLED"
+      target_capacity = 100
     }
   }
 }
