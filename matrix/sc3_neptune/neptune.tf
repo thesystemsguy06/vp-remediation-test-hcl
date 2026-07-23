@@ -12,6 +12,7 @@ resource "aws_neptune_subnet_group" "vp" {
 }
 
 resource "aws_neptune_cluster" "vp" {
+  enable_cloudwatch_logs_exports      = ["audit"]
   cluster_identifier                  = "vp-sc3-neptune-${random_id.s.hex}"
   engine                              = "neptune"
   engine_version                      = "1.3.4.0"
