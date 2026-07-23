@@ -22,7 +22,7 @@ resource "aws_elasticache_replication_group" "violating" {
   # VIOLATING settings:
   at_rest_encryption_enabled = false # ElastiCache.4
   transit_encryption_enabled = false # ElastiCache.5
-  automatic_failover_enabled = false # ElastiCache.3
+  automatic_failover_enabled = true  # ElastiCache.3
   auto_minor_version_upgrade = false # ElastiCache.6
   snapshot_retention_limit   = 0     # ElastiCache.7 (no automatic backups)
 
