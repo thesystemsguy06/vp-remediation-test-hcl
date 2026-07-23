@@ -9,4 +9,8 @@ resource "aws_kinesis_firehose_delivery_stream" "vp" {
     role_arn   = "arn:aws:iam::746210888062:role/vp-companion-856b2431"
     bucket_arn = "arn:aws:s3:::vp-test-data-746210888062"
   }
+
+  server_side_encryption {
+    enabled = true
+  }
 }
