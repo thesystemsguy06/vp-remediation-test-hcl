@@ -9,6 +9,7 @@ resource "aws_ec2_client_vpn_endpoint" "test" {
   }
 
   connection_log_options {
-    enabled = false
+    enabled              = true
+    cloudwatch_log_group = "arn:aws:logs:us-east-1:746210888062:log-group:/vp/companion/856b2431"
   }
 }
