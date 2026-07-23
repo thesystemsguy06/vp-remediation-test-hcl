@@ -1,4 +1,16 @@
 resource "aws_security_group" "vp_b3" {
+  ingress = [{
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
+    },
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = ["10.0.0.0/8"]
+  }]
   name        = "vp-b3-sg-rules"
   description = "vp b3 test open rules"
   vpc_id      = "vpc-0880cc850def460a5"
